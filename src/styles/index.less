@@ -1,0 +1,77 @@
+@import './variables.less';
+@import './mixin.less';
+@import './transition.less';
+@import './element-ui.less';
+@import './sidebar.less';
+@import './font.less';
+
+body {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+div:focus{
+  outline: none;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: rgba(0,122,255,1);
+  text-decoration: none;
+}
+
+a {
+  color: rgba(0,122,255,.6);
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+ul,li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+//main-container全局样式
+#app {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: @globalBg;
+}
+.app-main{
+  min-height: 100%
+}
+
+.app-container {
+  padding: 20px;
+}
