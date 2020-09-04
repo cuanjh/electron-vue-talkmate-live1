@@ -106,16 +106,19 @@
       </div>
     </el-main>
     <device-testing ref="deviceTesting"></device-testing>
+    <room ref="room"></room>
   </el-container>
 </template>
 
 <script>
 import moment from 'moment';
 
-import DeviceTesting from '@/components/DeviceTesting/DeviceTesting.vue';
 import {
   getLiveCourseList,
 } from '@/api/live';
+
+import DeviceTesting from '@/components/DeviceTesting/DeviceTesting.vue';
+import Room from '../room/Room.vue';
 
 export default {
   data() {
@@ -133,6 +136,7 @@ export default {
   },
   components: {
     DeviceTesting,
+    Room,
   },
   computed: {
     days() {
@@ -289,6 +293,7 @@ export default {
     },
     entryClassroom(item) {
       console.log(item);
+      this.$refs.room.show(item);
       // parent.window.store.set('liveCourseInfo', JSON.stringify(item));
       // parent.window.entryClassroom();
     },
@@ -386,6 +391,7 @@ export default {
       this.$refs.deviceTesting.show();
     },
     mockClassroom() {
+      // this.trtcCloud.startMicDeviceTest(300);
       // parent.window.store.set('liveCourseInfo', '');
       // parent.window.mockClassroom();
     },

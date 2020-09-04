@@ -64,11 +64,11 @@
 </template>
 
 <script>
-import TRTCCloud from 'trtc-electron-sdk';
+// import TRTCCloud from 'trtc-electron-sdk';
 
 import { getLangs, getSendSmsCode } from '@/api/login';
 
-let trtcCloud = null; // 用于TRTCQcloud 实例， mounted 时实体化
+// let trtcCloud = null; // 用于TRTCQcloud 实例， mounted 时实体化
 
 export default {
   data() {
@@ -96,8 +96,8 @@ export default {
       console.log(res);
     });
     // 创建TRTC对象
-    trtcCloud = new TRTCCloud();
-    this.version = trtcCloud.getSDKVersion();
+    // trtcCloud = new TRTCCloud();
+    // this.version = trtcCloud.getSDKVersion();
     // this.ncCaptchaVerify()
   },
   computer: {

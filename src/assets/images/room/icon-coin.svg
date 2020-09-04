@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="36px" height="36px" viewBox="0 0 36 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>编组 42@3x</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="18" cy="18" r="18"></circle>
+        <circle id="path-3" cx="11.1428571" cy="11.1428571" r="11.1428571"></circle>
+        <path d="M19.8680782,13.965704 C20.5818235,13.965704 21.1603796,14.51738 21.1603796,15.1978245 C21.1603796,15.8782689 20.5818235,16.4299449 19.8680782,16.4299449 C19.1545553,16.4299449 18.5759991,15.8782689 18.5759991,15.1978245 C18.5759991,14.51738 19.1545553,13.965704 19.8680782,13.965704 L19.8680782,13.965704 Z M23.1428571,18.5122902 L23.1428571,13.4279191 C23.1428571,12.6405351 22.4035416,12 21.4952395,12 L14.4967558,12 C13.5924561,12 12.8571429,12.6376686 12.8571429,13.4210838 L12.8571429,17.4479657 C12.8571429,22.1074449 14.9994904,24.490544 20.2518552,25.6739353 L20.4310698,25.7142857 L21.3793949,23.3852076 L21.1926204,23.3256742 C18.0403566,22.322206 16.7378271,20.8770884 16.8707927,18.5122902 L23.1428571,18.5122902 Z" id="path-5"></path>
+        <filter x="-53.5%" y="-25.5%" width="206.9%" height="180.2%" filterUnits="objectBoundingBox" id="filter-6">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.880802763   0 0 0 0 0.462239466   0 0 0 0 0  0 0 0 1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="MC_1-1备份-5" transform="translate(-323.000000, -619.000000)">
+            <g id="编组-42" transform="translate(323.000000, 619.000000)">
+                <g id="椭圆形备份-21">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <use id="蒙版" fill="#F8C20C" xlink:href="#path-1"></use>
+                    <circle fill="#FFFFFF" opacity="0.290829613" mask="url(#mask-2)" cx="9.85714286" cy="8.14285714" r="10.7142857"></circle>
+                </g>
+                <g id="椭圆形" transform="translate(6.857143, 6.857143)">
+                    <mask id="mask-4" fill="white">
+                        <use xlink:href="#path-3"></use>
+                    </mask>
+                    <use id="蒙版" fill="#F78204" xlink:href="#path-3"></use>
+                    <circle fill="#FFFFFF" opacity="0.290829613" mask="url(#mask-4)" cx="3" cy="1.28571429" r="10.7142857"></circle>
+                </g>
+                <g id="Fill-11">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-6)" xlink:href="#path-5"></use>
+                    <use fill="#F5C808" fill-rule="evenodd" xlink:href="#path-5"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
