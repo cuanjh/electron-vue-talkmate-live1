@@ -33,9 +33,12 @@ export default {
     micTest(flag) {
       this.$emit('handlerClick', { tab: 'mic', flag });
     },
+    close() {
+      this.$emit('handlerClick', { tab: 'mic', event: 'stopTestMic' });
+    },
   },
   destroyed() {
-    this.$emit('handlerClick', { tab: 'mic', event: 'stopTestMic' });
+    this.close();
   },
 };
 </script>

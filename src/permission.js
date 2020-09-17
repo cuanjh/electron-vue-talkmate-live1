@@ -18,11 +18,7 @@ const logout = (next, err) => {
 router.beforeEach((to, from, next) => {
   NProgress.start();
   if (cookie.getCookie('isLogin') === 'true') {
-    if (to.path === '/login') {
-      next({ path: '/' });
-      // if current page is dashboard will not trigger afterEach hook, so manually handle it
-      NProgress.done();
-    } else if (store.getters.verifyStatus === -1) {
+    if (store.getters.verifyStatus === -1 || to.path === '/' || to.path === '/login') {
       store.dispatch('GetUserInfo', { user_id: store.getters.userId }).then(() => { // 拉取用户信息
         let path = '';
         switch (store.getters.verifyStatus) {
@@ -34,7 +30,7 @@ router.beforeEach((to, from, next) => {
             path = '/verify/detail';
             break;
           default:
-            path = '/course';
+            path = '/course/rili';
             break;
         }
         next(path);

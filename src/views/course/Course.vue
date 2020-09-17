@@ -293,7 +293,8 @@ export default {
     },
     entryClassroom(item) {
       console.log(item);
-      this.$refs.room.show(item);
+      this.$store.commit('SET_CURLIVECOURSE', item);
+      this.$refs.room.show();
       // parent.window.store.set('liveCourseInfo', JSON.stringify(item));
       // parent.window.entryClassroom();
     },

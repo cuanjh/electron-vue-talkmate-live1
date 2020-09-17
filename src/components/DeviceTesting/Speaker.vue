@@ -19,7 +19,9 @@
 export default {
   props: ['tabData'],
   mounted() {
-    this.$refs.speakerAudio.play();
+    if (this.$refs.speakerAudio) {
+      this.$refs.speakerAudio.play();
+    }
   },
   methods: {
     show() {
@@ -27,8 +29,14 @@ export default {
     speakerTest(flag) {
       this.$emit('handlerClick', { tab: 'speaker', flag });
     },
+    close() {
+      if (this.$refs.speakerAudio) {
+        this.$refs.speakerAudio.pause();
+      }
+    },
   },
   destroyed() {
+    this.close();
   },
 };
 </script>

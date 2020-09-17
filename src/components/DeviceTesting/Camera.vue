@@ -24,9 +24,12 @@ export default {
     cameraTest(flag) {
       this.$emit('handlerClick', { tab: 'camera', flag });
     },
+    close() {
+      this.$emit('handlerClick', { tab: 'camera', event: 'stopTestCamera' });
+    },
   },
   destroyed() {
-    this.$emit('handlerClick', { tab: 'camera', event: 'stopTestCamera' });
+    this.close();
   },
 };
 </script>

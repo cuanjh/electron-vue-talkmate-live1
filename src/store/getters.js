@@ -5,6 +5,7 @@ const getters = {
   photo: (state) => state.user.photo,
   verifyStatus: (state) => state.user.verifyStatus,
   moduleList: (state) => state.live.moduleList,
+  curLiveCourse: (state) => state.live.curLiveCourse,
 };
 
 export default getters;

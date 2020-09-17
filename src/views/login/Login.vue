@@ -1,6 +1,6 @@
 <template>
   <el-container class="login-container">
-    <div id="login-modal" :class="['login-modal', {'is-shown': isShow}]">
+    <div id="login-modal" v-show="isShow" class="login-modal">
       <div class="login-wrapper">
         <div class="logo-bg"></div>
         <div class="login">
@@ -65,10 +65,13 @@
 
 <script>
 // import TRTCCloud from 'trtc-electron-sdk';
-
-import { getLangs, getSendSmsCode } from '@/api/login';
+import {
+  // getLangs,
+  getSendSmsCode,
+} from '@/api/login';
 
 // let trtcCloud = null; // 用于TRTCQcloud 实例， mounted 时实体化
+const { ipcRenderer } = window.require('electron');
 
 export default {
   data() {
@@ -92,9 +95,9 @@ export default {
   },
   mounted() {
     this.isShow = true;
-    getLangs().then((res) => {
-      console.log(res);
-    });
+    // getLangs().then((res) => {
+    //   console.log(res);
+    // });
     // 创建TRTC对象
     // trtcCloud = new TRTCCloud();
     // this.version = trtcCloud.getSDKVersion();
@@ -134,24 +137,28 @@ export default {
           };
           this.$store.dispatch('Login', obj).then((res) => {
             if (res.success) {
-              this.loading = false;
-              this.$store.dispatch('GetUserInfo', { user_id: this.$store.getters.userId }).then((res2) => {
-                if (res2.success) {
-                  switch (res2.data.status) {
-                    case 0:
-                      this.$router.push({ path: '/verify/edit' });
-                      break;
-                    case 1:
-                    case 2:
-                      this.$router.push({ path: '/verify/detail' });
-                      break;
-                    default:
-                      this.$router.push({ path: '/course/rili' });
-                      break;
+              this.isShow = false;
+              this.$store.dispatch('GetUserInfo', { user_id: this.$store.getters.userId })
+                .then((res2) => {
+                  if (res2.success) {
+                    this.loading = false;
+                    setTimeout(() => {
+                      switch (res2.data.status) {
+                        case 0:
+                          this.$router.push({ path: '/verify/edit' });
+                          break;
+                        case 1:
+                        case 2:
+                          this.$router.push({ path: '/verify/detail' });
+                          break;
+                        default:
+                          this.$router.push({ path: '/course/rili' });
+                          break;
+                      }
+                      ipcRenderer.send('loginSuccess');
+                    }, 100);
                   }
-                  this.isShow = false;
-                }
-              });
+                });
             }
           }).catch(() => {
             this.loading = false;
@@ -174,7 +181,7 @@ export default {
 
 <style lang="less" scoped>
 .login-container {
-  background: rgba(0, 0, 0, .1);
+  background: #FFFFFF;
   width: 100%;
   height: -webkit-fill-available;
   align-items: center;

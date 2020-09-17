@@ -40,6 +40,7 @@ export default {
     completed() {
       this.$emit('handlerClick', { tab: 'result', event: 'complete' });
     },
+    close() {},
   },
 };
 </script>

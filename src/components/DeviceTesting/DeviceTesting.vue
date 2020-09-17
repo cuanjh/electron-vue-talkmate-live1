@@ -123,6 +123,7 @@ export default {
     },
     close() {
       this.completed();
+      this.$refs[this.view].close();
     },
     subscribeEvents(rtcCloud) {
       rtcCloud.on('onError', (errcode, errmsg) => {

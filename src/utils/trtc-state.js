@@ -1,12 +1,10 @@
 import TRTCCloud from 'trtc-electron-sdk';
 import Log from './log';
 
-// const trtcCloud = new TRTCCloud();
-
+const trtcCloud = new TRTCCloud();
 const logger = new Log('TRTCState');
 class TRTCState {
   constructor() {
-    this.trtcCloud = new TRTCCloud();
     this.camera = false;
     this.mic = false;
     this.micVolume = 0;
@@ -14,14 +12,6 @@ class TRTCState {
     this.speakerVolume = 0;
     this.network = false;
     this.checkTaskId = 0;
-    this.cameraDeviceInfo = null;
-    this.micDeviceInfo = null;
-    this.speakerDeviceInfo = null;
-    this.testMicVolume = 0;
-
-    this.trtcCloud.on('onTestMicVolume', (volume) => {
-      this.testMicVolume = volume;
-    });
   }
 
   check(callBack) {
@@ -37,20 +27,16 @@ class TRTCState {
         speaker: this.speaker,
         micVolume: this.micVolume,
         speakerVolume: this.speakerVolume,
-        cameraDeviceInfo: this.cameraDeviceInfo,
-        micDeviceInfo: this.micDeviceInfo,
-        speakerDeviceInfo: this.speakerDeviceInfo,
-        testMicVolume: this.testMicVolume,
       });
     }
   }
 
   startCheckTask(callBack) {
     this.check(callBack);
-    // this.checkTaskId = setInterval(() => {
-    //   this.check(callBack);
-    // }, 500);
-    // logger.log('startCheckTask, checkTaskId', this.checkTaskId);
+    this.checkTaskId = setInterval(() => {
+      this.check(callBack);
+    }, 500);
+    logger.log('startCheckTask, checkTaskId', this.checkTaskId);
   }
 
   stopCheckTask() {
@@ -59,18 +45,15 @@ class TRTCState {
   }
 
   isCameraReady() {
-    const deviceInfo = this.trtcCloud.getCurrentCameraDevice();
+    const deviceInfo = trtcCloud.getCurrentCameraDevice();
     if (deviceInfo && deviceInfo.deviceId !== '') {
       this.camera = true;
-      this.cameraDeviceInfo = deviceInfo;
       return true;
     }
-    const deviceList = this.trtcCloud.getCameraDevicesList();
+    const deviceList = trtcCloud.getCameraDevicesList();
     if (deviceList.length >= 1) {
       if (deviceList.length > 1) {
-        this.trtcCloud.setCurrentCameraDevice(deviceList[0].deviceId);
-        const obj = deviceList[0];
-        this.cameraDeviceInfo = obj;
+        trtcCloud.setCurrentCameraDevice(deviceList[0].deviceId);
       }
       this.camera = true;
       return true;
@@ -79,18 +62,15 @@ class TRTCState {
   }
 
   isMicReady() {
-    const deviceInfo = this.trtcCloud.getCurrentMicDevice();
+    const deviceInfo = trtcCloud.getCurrentMicDevice();
     if (deviceInfo && deviceInfo.deviceId !== '') {
       this.mic = true;
-      this.micDeviceInfo = deviceInfo;
       return true;
     }
-    const deviceList = this.trtcCloud.getMicDevicesList();
+    const deviceList = trtcCloud.getMicDevicesList();
     if (deviceList.length >= 1) {
       if (deviceList.length > 1) {
-        this.trtcCloud.setCurrentMicDevice(deviceList[0].deviceId);
-        const obj = deviceList[0];
-        this.micDeviceInfo = obj;
+        trtcCloud.setCurrentMicDevice(deviceList[0].deviceId);
       }
       this.mic = true;
       return true;
@@ -99,18 +79,15 @@ class TRTCState {
   }
 
   isSpeakerReady() {
-    const deviceInfo = this.trtcCloud.getCurrentSpeakerDevice();
+    const deviceInfo = trtcCloud.getCurrentSpeakerDevice();
     if (deviceInfo && deviceInfo.deviceId !== '') {
       this.speaker = true;
-      this.speakerDeviceInfo = deviceInfo;
       return true;
     }
-    const deviceList = this.trtcCloud.getSpeakerDevicesList();
+    const deviceList = trtcCloud.getSpeakerDevicesList();
     if (deviceList.length >= 1) {
       if (deviceList.length > 1) {
-        this.trtcCloud.setCurrentSpeakerDevice(deviceList[0].deviceId);
-        const obj = deviceList[0];
-        this.speakerDeviceInfo = obj;
+        trtcCloud.setCurrentSpeakerDevice(deviceList[0].deviceId);
       }
       this.speaker = true;
       return true;
@@ -119,23 +96,15 @@ class TRTCState {
   }
 
   getSpeakerVolume() {
-    this.speakerVolume = this.trtcCloud.getCurrentSpeakerVolume();
+    this.speakerVolume = trtcCloud.getCurrentSpeakerVolume();
     return this.speakerVolume;
   }
 
   getMicVolume() {
-    this.micVolume = this.trtcCloud.getCurrentMicDeviceVolume();
+    this.micVolume = trtcCloud.getCurrentMicDeviceVolume();
     return this.micVolume;
   }
-
-  startTestMic() {
-    this.trtcCloud.startMicDeviceTest(300);
-  }
-
-  stopTestMic() {
-    this.trtcCloud.stopMicDeviceTest();
-    this.testMicVolume = 0;
-  }
 }
+
 const trtcState = new TRTCState();
 export default trtcState;

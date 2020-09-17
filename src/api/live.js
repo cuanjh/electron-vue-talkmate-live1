@@ -99,3 +99,82 @@ export const getModuleList = (data) => {
   });
   return res;
 };
+
+// 获取腾讯云用户计算签名sign
+export const getUserSign = (data) => {
+  const res = request({
+    url: urls.findUserSignUrl,
+    method: 'get',
+    data,
+  });
+  return res;
+};
+
+// 获取课程的房间号
+export const getLiveCourseRoomId = (data) => {
+  const res = request({
+    url: urls.liveCourseRoomIdUrl,
+    method: 'post',
+    data,
+  });
+  return res;
+};
+
+// 文件转码列表
+export const courseFileList = (data) => {
+  const res = request({
+    url: urls.courseFileListUrl,
+    method: 'post',
+    data,
+  });
+  return res;
+};
+
+// 删除直播课课件
+export const delCourseFile = (data) => {
+  const res = request({
+    url: urls.delCourseFileUrl,
+    method: 'post',
+    data,
+  });
+  return res;
+};
+
+// 创建文档转码任务
+export const createFilesTranscode = (data) => {
+  const res = request({
+    url: urls.createFilesTranscodeUrl,
+    method: 'post',
+    data,
+  });
+  return res;
+};
+
+// 查询文档转码任务
+export const describeTranscode = (data) => {
+  const res = request({
+    url: urls.describeTranscodeUrl,
+    method: 'post',
+    data,
+  });
+  return res;
+};
+
+// 获取融云IM用户token
+export const getIMUserToken = () => {
+  const res = request({
+    url: urls.imUserTokenUrl,
+    method: 'get',
+  });
+  return res;
+};
+
+// 直播评论
+export const liveComment = (data) => {
+  const res = request({
+    url: urls.liveCommentUrl,
+    method: 'get',
+    data,
+  });
+  return res;
+};

@@ -42,6 +42,7 @@
 import { mapGetters } from 'vuex';
 import ScrollBar from '@/components/ScrollBar/index.vue';
 // import SidebarItem from './SidebarItem.vue';
+const { ipcRenderer } = window.require('electron');
 
 export default {
   data() {
@@ -111,7 +112,10 @@ export default {
         center: true,
       }).then(() => {
         this.$store.dispatch('LogOut').then(() => {
-          this.$router.push({ path: '/login' });
+          setTimeout(() => {
+            this.$router.push({ path: '/login' });
+            ipcRenderer.send('logout');
+          }, 100);
         });
       }).catch(() => {
         this.$message({

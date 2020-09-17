@@ -5,6 +5,7 @@ const live = {
   state: {
     teacherInfo: null,
     moduleList: [],
+    curLiveCourse: null,
   },
   mutations: {
     SET_TEACHERINFO: (state, teacherInfo) => {
@@ -12,6 +13,9 @@ const live = {
     },
     SET_MODULELIST: (state, list) => {
       state.moduleList = list;
+    },
+    SET_CURLIVECOURSE: (state, course) => {
+      state.curLiveCourse = course;
     },
   },
   actions: {

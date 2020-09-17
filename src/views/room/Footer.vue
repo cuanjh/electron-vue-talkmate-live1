@@ -29,16 +29,25 @@
       </div>
       <div class="btnStartOrEnd">
         <a href="javascript:;" :class="['btn', {'active': isStart }]" @click="startOrEndClass">
-          <i :class="{'el-icon-caret-right': !isStart}"></i>{{ isStart ? '结束下课' : '开始上课'}}
+          <i :class="{'el-icon-video-play': !isStart, 'el-icon-video-pause': isStart}"></i>
+          {{ isStart ? '结束下课' : '开始上课'}}
         </a>
       </div>
-      <div class="right"></div>
+      <div class="right">
+        <el-tooltip class="item" effect="dark"
+          :content="isScreenSharing ? '停止屏幕分享' : '开启屏幕分享'" placement="top">
+          <a href="javascript:;"
+            @click="onScreenShare"
+            :class="[{'start-share': !isScreenSharing, 'stop-share': isScreenSharing}]"><i></i></a>
+        </el-tooltip>
+      </div>
     </div>
   </el-footer>
 </template>
 
 <script>
 export default {
+  props: ['isScreenSharing'],
   data() {
     return {
       muteLocalAudio: false,
@@ -53,7 +62,17 @@ export default {
     onMuteLocalAudio() {},
     onMicVolumeChanged() {},
     handleResolution() {},
-    startOrEndClass() {},
+    startOrEndClass() {
+      this.isStart = !this.isStart;
+      if (this.isStart) {
+        this.$emit('startLiveCountDown');
+      } else {
+        this.$emit('stopLive');
+      }
+    },
+    onScreenShare() {
+      this.$emit('toggleScreenSharing');
+    },
   },
 };
 </script>
@@ -230,10 +249,48 @@ export default {
   background: rgba(215,42,101,1);
 }
 
-.btnStartOrEnd .active i {
-  width: 23px;
-  height: 23px;
-  background: #ffffff;
-  border-radius: 5px;
+.right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  i {
+    transition: all linear .3s;
+  }
+}
+
+.start-share {
+  width: 48px;
+  height: 48px;
+}
+
+.start-share i {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  background-image: url('../../assets/images/room/start-share.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.start-share:hover i {
+  background-image: url('../../assets/images/room/start-share-hover.svg');
+}
+
+.stop-share {
+  width: 48px;
+  height: 48px;
+}
+
+.stop-share i {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  background-image: url('../../assets/images/room/stop-share.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.stop-share:hover i {
+  background-image: url('../../assets/images/room/stop-share-hover.svg');
 }
 </style>

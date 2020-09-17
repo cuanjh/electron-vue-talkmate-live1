@@ -20,7 +20,9 @@
 export default {
   props: ['netWorkStatis', 'courseTitle', 'courseHMS'],
   methods: {
-    close() {},
+    close() {
+      this.$emit('close');
+    },
   },
 };
 </script>
@@ -28,6 +30,7 @@ export default {
 <style lang="less" scoped>
 .el-header {
   position: relative;
+  height: 70px !important;
 }
 
 .el-header .wifi{

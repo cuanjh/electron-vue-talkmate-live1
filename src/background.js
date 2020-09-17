@@ -1,4 +1,6 @@
-import { app, protocol, BrowserWindow } from 'electron';
+import {
+  app, protocol, BrowserWindow, session, ipcMain,
+} from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 // import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 
@@ -13,11 +15,28 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } },
 ]);
 
+let isLogin = false;
+
 function createWindow() {
   // Create the browser window.
+  let winOpt = {
+    width: 700,
+    height: 473,
+    resizable: false,
+  };
+  if (isLogin) {
+    winOpt = {
+      width: 1280,
+      height: 800,
+      resizable: true,
+    };
+  }
   win = new BrowserWindow({
-    width: 1280,
-    height: 800,
+    width: winOpt.width,
+    height: winOpt.height,
+    frame: false,
+    titleBarStyle: 'hidden',
+    resizable: winOpt.resizable,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration
@@ -54,6 +73,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
+  console.log('app activate');
   if (win === null) {
     createWindow();
   }
@@ -63,6 +83,7 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
+  console.log('app ready');
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     // try {
@@ -71,7 +92,19 @@ app.on('ready', async () => {
     //   console.error('Vue Devtools failed to install:', e.toString());
     // }
   }
-  createWindow();
+  // 查询所有 cookies。
+  session.defaultSession.cookies.get({})
+    .then((cookies) => {
+      const cookieIsLogin = cookies.find((item) => item.name === 'isLogin');
+      if (cookieIsLogin && cookieIsLogin.value === 'true') {
+        isLogin = true;
+      }
+      console.log(cookies);
+      createWindow();
+    }).catch((error) => {
+      console.log(error);
+      createWindow();
+    });
 });
 
 // Exit cleanly on request from parent process in development mode.
@@ -88,3 +121,34 @@ if (isDevelopment) {
     });
   }
 }
+
+ipcMain.on('loginSuccess', () => {
+  win.hide();
+  setTimeout(() => {
+    if (process.platform === 'darwin') {
+      win.setWindowButtonVisibility(true);
+      win.setTrafficLightPosition({ x: 15, y: 20 });
+    }
+    win.setResizable(true);
+    win.maximize();
+    win.center();
+    win.show();
+  }, 500);
+});
+
+ipcMain.on('logout', () => {
+  win.hide();
+  win.setResizable(false);
+  setTimeout(() => {
+    if (process.platform === 'darwin') {
+      win.setWindowButtonVisibility(false);
+    }
+    win.setSize(700, 473);
+    win.show();
+    win.center();
+  }, 300);
+});
+
+ipcMain.on('winShow', () => {
+  win.show();
+});
