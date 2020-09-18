@@ -154,6 +154,7 @@ export default {
 
 .el-main {
   padding: 40px 0 40px 20px;
+  -webkit-app-region: no-drag;
 }
 
 .course-list {

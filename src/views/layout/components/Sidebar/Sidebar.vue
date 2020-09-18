@@ -112,6 +112,7 @@ export default {
         center: true,
       }).then(() => {
         this.$store.dispatch('LogOut').then(() => {
+          this.$store.commit('SET_LAYOUTISSHOW', false);
           setTimeout(() => {
             this.$router.push({ path: '/login' });
             ipcRenderer.send('logout');

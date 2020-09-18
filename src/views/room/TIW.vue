@@ -64,9 +64,9 @@
             <i></i>多媒体
           </div>
           <div class="line"></div>
-          <div class="files" @click="openFiles">
+          <a class="files" @click="openFiles">
             <i></i>打开课件
-          </div>
+          </a>
         </div>
       </div>
       <div id="paint_box" v-show="isShowPaintBox"

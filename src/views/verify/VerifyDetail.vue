@@ -220,9 +220,10 @@ export default {
   color: #000000;
 }
 
-.add-user-identify > .el-main {
-  padding: 20px 0 40px 40px;
+.el-main {
+  -webkit-app-region: no-drag;
 }
+
 .main-content > .title {
   font-size: 16px;
   font-weight: 500;

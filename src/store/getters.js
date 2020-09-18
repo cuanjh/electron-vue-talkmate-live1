@@ -6,6 +6,7 @@ const getters = {
   verifyStatus: (state) => state.user.verifyStatus,
   moduleList: (state) => state.live.moduleList,
   curLiveCourse: (state) => state.live.curLiveCourse,
+  layoutIsShow: (state) => state.layout.isShow,
 };
 
 export default getters;

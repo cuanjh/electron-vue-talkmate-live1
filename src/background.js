@@ -37,6 +37,8 @@ function createWindow() {
     frame: false,
     titleBarStyle: 'hidden',
     resizable: winOpt.resizable,
+    minimizable: true, // 可否最小化
+    maximizable: true, // 可否最大化
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration
@@ -59,6 +61,16 @@ function createWindow() {
   win.on('closed', () => {
     win = null;
   });
+
+  // 最大化窗口
+  win.on('maximize', () => {
+    win.webContents.send('winIsMax', true);
+  });
+
+  // 取消最大化窗口
+  win.on('unmaximize', () => {
+    win.webContents.send('winIsMax', false);
+  });
 }
 
 // Quit when all windows are closed.
@@ -73,7 +85,6 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  console.log('app activate');
   if (win === null) {
     createWindow();
   }
@@ -83,7 +94,6 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-  console.log('app ready');
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     // try {
@@ -99,7 +109,6 @@ app.on('ready', async () => {
       if (cookieIsLogin && cookieIsLogin.value === 'true') {
         isLogin = true;
       }
-      console.log(cookies);
       createWindow();
     }).catch((error) => {
       console.log(error);
@@ -138,12 +147,12 @@ ipcMain.on('loginSuccess', () => {
 
 ipcMain.on('logout', () => {
   win.hide();
-  win.setResizable(false);
   setTimeout(() => {
     if (process.platform === 'darwin') {
       win.setWindowButtonVisibility(false);
     }
     win.setSize(700, 473);
+    win.setResizable(false);
     win.show();
     win.center();
   }, 300);
@@ -151,4 +160,37 @@ ipcMain.on('logout', () => {
 
 ipcMain.on('winShow', () => {
   win.show();
+});
+
+// 隐藏窗口
+ipcMain.on('winHide', () => {
+  win.hide();
+});
+
+// 最小化窗口
+ipcMain.on('winMin', () => {
+  win.minimize();
+});
+
+// 最大化窗口
+ipcMain.on('winMax', (event) => {
+  let isMax = false;
+  if (win.isMaximized()) {
+    win.unmaximize();
+  } else {
+    win.maximize();
+    isMax = true;
+  }
+  event.reply('winIsMax', isMax);
+});
+
+// 关闭窗口
+ipcMain.on('winClose', (_, args) => {
+  if (args) {
+    console.log(1);
+    win.destroy();
+  } else {
+    console.log(2);
+    // showLoginPage()
+  }
 });

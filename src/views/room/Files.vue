@@ -250,6 +250,7 @@ export default {
   color: rgba(0,0,0,.4);
   font-weight: bolder;
   cursor: pointer;
+  -webkit-app-region: no-drag;
 }
 
 .dialog-title-bar .operate .close {

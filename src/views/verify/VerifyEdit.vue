@@ -375,8 +375,9 @@ export default {
   color: #000000;
 }
 
-.add-user-identify > .el-main {
+.el-main {
   padding: 20px 0 40px 40px;
+  -webkit-app-region: no-drag;
 }
 
 .main-content > .title {

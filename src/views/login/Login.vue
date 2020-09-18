@@ -64,13 +64,10 @@
 </template>
 
 <script>
-// import TRTCCloud from 'trtc-electron-sdk';
 import {
-  // getLangs,
   getSendSmsCode,
 } from '@/api/login';
 
-// let trtcCloud = null; // 用于TRTCQcloud 实例， mounted 时实体化
 const { ipcRenderer } = window.require('electron');
 
 export default {
@@ -170,10 +167,10 @@ export default {
       });
     },
     hide() {
-      // ipcRenderer.send('winHide')
+      ipcRenderer.send('winMin');
     },
     close() {
-      // ipcRenderer.send('winClose', true)
+      ipcRenderer.send('winClose', true);
     },
   },
 };

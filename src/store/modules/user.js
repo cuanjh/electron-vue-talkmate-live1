@@ -41,7 +41,7 @@ const user = {
             if (response.result) {
               cookie.setCookie('user_id', response.result.user_id);
               cookie.setCookie('verify', response.result.verify);
-              cookie.setCookie('isLogin', true);
+              cookie.setCookie('isLogin', 'true');
               commit('SET_USERID', response.result.user_id);
               resolve(response);
             }
@@ -68,11 +68,12 @@ const user = {
       });
     },
     // 登出
-    LogOut() {
+    LogOut({ commit }) {
       return new Promise((resolve) => {
         cookie.delCookie('user_id');
         cookie.delCookie('verify');
         cookie.delCookie('isLogin');
+        commit('SET_USERID', '');
         resolve();
         // userLogout()
         //   .then(() => {
@@ -87,11 +88,12 @@ const user = {
       });
     },
     // 前端 登出
-    FedLogOut() {
+    FedLogOut({ commit }) {
       return new Promise((resolve) => {
         cookie.delCookie('user_id');
         cookie.delCookie('verify');
         cookie.delCookie('isLogin');
+        commit('SET_USERID', '');
         resolve();
       });
     },

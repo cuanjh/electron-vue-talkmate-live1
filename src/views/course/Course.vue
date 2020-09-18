@@ -493,6 +493,7 @@ export default {
   background-repeat: no-repeat;
   background-size: cover;
   cursor: pointer;
+  -webkit-app-region: no-drag;
 }
 
 .rili-panel .top .switch i:first-child {
@@ -541,6 +542,7 @@ export default {
   height: 42px;
   text-align: center;
   cursor: pointer;
+  -webkit-app-region: no-drag;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -596,6 +598,7 @@ export default {
   justify-content: center;
   margin-left: 30px;
   cursor: pointer;
+  -webkit-app-region: no-drag;
 }
 .year-month .rili i {
   width: 18px;
@@ -694,6 +697,7 @@ export default {
   flex:1 0 auto;
   margin-right: 22px;
   cursor: pointer;
+  -webkit-app-region: no-drag;
   user-select: none;
   transition: all .3s ease-in-out;
   -webkit-transition: all .3s ease-in-out;
@@ -774,6 +778,7 @@ export default {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  -webkit-app-region: no-drag;
   left: -26px;
   top: 42px;
 }
@@ -797,6 +802,7 @@ export default {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  -webkit-app-region: no-drag;
   right: -26px;
   top: 42px;
 }
@@ -812,6 +818,7 @@ export default {
 
 .el-main {
   padding: 8px 0 0 25px;
+  -webkit-app-region: no-drag;
 }
 
 .course-container .course-list {

@@ -381,6 +381,7 @@ export default {
   margin: 0;
   background: rgba(0, 0, 0, .6);
   z-index: 999;
+  -webkit-app-region: drag;
 }
 
 .dialog-modal-wrap {
@@ -401,6 +402,7 @@ export default {
   top: -32px;
   line-height: 35px;
   text-align: center;
+  -webkit-app-region: no-drag;
   cursor: pointer;
 }
 
@@ -441,6 +443,7 @@ export default {
   width: 100%;
   height: 100%;
   cursor: pointer;
+  -webkit-app-region: no-drag;
   transition: all .3s linear;
 }
 

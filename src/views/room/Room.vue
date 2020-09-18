@@ -159,7 +159,7 @@ export default {
       }
 
       // 2.获取计算签名
-      const res2 = await getUserSign({ userId: this.userId });
+      const res2 = await getUserSign({ user_id: this.userId });
       if (res2.success && res2.data) {
         this.sdkAppId = res2.data.sdkappid;
         this.userSig = res2.data.usersig;

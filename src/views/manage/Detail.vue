@@ -144,6 +144,7 @@ export default {
   font-size: 18px;
   font-weight: 400;
   color: #053579;
+  -webkit-app-region: no-drag;
   cursor: pointer;
 }
 
@@ -185,6 +186,10 @@ export default {
   font-size: 14px;
   font-weight: 400;
   color: #54647d;
+}
+
+.el-main {
+  -webkit-app-region: no-drag;
 }
 
 .course-list {
