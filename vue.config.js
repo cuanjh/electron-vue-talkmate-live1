@@ -70,6 +70,10 @@ const vueCliConfig = {
         appId: 'com.talkmate.app',
         productName: 'talkmate_live', // 项目名，也是生成的安装文件名，即talkmate_live.exe
         copyright: 'Copyright © 2020', // 版权信息
+        extraResources: {
+          from: './resources',
+          to: './',
+        },
         //   directories: {
         //     output: './dist' //输出文件路径
         //   },

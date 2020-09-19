@@ -34,7 +34,7 @@
                   <div class="col"
                     v-for="(col, ci) in row"
                     :key="'col' + ri + '-' + ci"
-                    @click="switchDay(col.day)">
+                    @click="switchDay(col.day, true)">
                     <span
                       :class="['day',
                         {'cur': '' + year + (month-1) + col.day == '' + (new Date()).getFullYear()
@@ -66,7 +66,7 @@
             {'active': i.day == activeIndex}]"
             v-for="i in days"
             :key="i.day"
-            @click="switchDay(i.day)">
+            @click="switchDay(i.day, false)">
             <div class="week">{{weeks[(new Date(year, month-1, i.day)).getDay()]}}</div>
             <div class="day">{{i.day}}</div>
             <div class="dot" v-show="i.isHaveCourse"></div>
@@ -142,7 +142,7 @@ export default {
     days() {
       const date = new Date(this.year, this.month, 0);
       const list = [];
-      for (let i = 1; i < date.getDate(); i += 1) {
+      for (let i = 1; i <= date.getDate(); i += 1) {
         const obj = {
           day: i,
           isHaveCourse: false,
@@ -301,31 +301,33 @@ export default {
     handlePlayback(item) {
       console.log(item);
     },
-    switchDay(i) {
+    switchDay(i, f) {
       if (!i) return;
       this.activeIndex = i;
-      const domObj = document.querySelector('.days');
-      let sl = domObj.scrollLeft;
-      console.log('scrollLeft', sl);
-      const dayObj = document.querySelectorAll('.days .item')[i - 1];
-      const dayOffsetLeft = dayObj.offsetLeft;
-      let flag = 'left';
-      if (sl - dayOffsetLeft < 0) {
-        flag = 'right';
+      if (f) {
+        const domObj = document.querySelector('.days');
+        let sl = domObj.scrollLeft;
+        console.log('scrollLeft', sl);
+        const dayObj = document.querySelectorAll('.days .item')[i - 1];
+        const dayOffsetLeft = dayObj.offsetLeft;
+        let flag = 'left';
+        if (sl - dayOffsetLeft < 0) {
+          flag = 'right';
+        }
+        const intervalInstance = setInterval(() => {
+          if (flag === 'left') {
+            sl -= 6;
+          } else {
+            sl += 6;
+          }
+          if ((flag === 'left' && sl <= dayOffsetLeft) || (flag === 'right' && sl >= dayOffsetLeft)) {
+            clearInterval(intervalInstance);
+            document.querySelector('.days').scrollLeft = dayOffsetLeft;
+          }
+          document.querySelector('.days').scrollLeft = sl;
+        }, 1);
+        this.isShowRili = false;
       }
-      const intervalInstance = setInterval(() => {
-        if (flag === 'left') {
-          sl -= 6;
-        } else {
-          sl += 6;
-        }
-        if ((flag === 'left' && sl <= dayOffsetLeft) || (flag === 'right' && sl >= dayOffsetLeft)) {
-          clearInterval(intervalInstance);
-          document.querySelector('.days').scrollLeft = dayOffsetLeft;
-        }
-        document.querySelector('.days').scrollLeft = sl;
-      }, 1);
-      this.isShowRili = false;
     },
     prev() {
       this.scrollAnimate('left');

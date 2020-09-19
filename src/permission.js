@@ -5,6 +5,11 @@ import 'nprogress/nprogress.css'; // Progress 进度条样式
 import router from './router';
 import store from './store';
 
+const Store = window.require('electron-store');
+const { ipcRenderer } = window.require('electron');
+
+const eStore = new Store();
+
 const whiteList = ['/login']; // 不重定向白名单
 
 const logout = (next, err) => {
@@ -16,7 +21,8 @@ const logout = (next, err) => {
 
 router.beforeEach((to, from, next) => {
   NProgress.start();
-  if (store.getters.userId) {
+  const isLogin = eStore.get('isLogin');
+  if (isLogin && store.getters.userId) {
     if (store.getters.verifyStatus === -1 || to.path === '/' || to.path === '/login') {
       store
         .dispatch('GetUserInfo', { user_id: store.getters.userId })
@@ -44,6 +50,7 @@ router.beforeEach((to, from, next) => {
       next();
     }
   } else if (whiteList.indexOf(to.path) !== -1) {
+    ipcRenderer.send('logout');
     next();
   } else {
     next('/login');

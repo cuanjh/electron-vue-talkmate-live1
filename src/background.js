@@ -1,8 +1,11 @@
 import {
-  app, protocol, BrowserWindow, session, ipcMain,
+  app, protocol, BrowserWindow, ipcMain,
 } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 // import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+const Store = require('electron-store');
+
+const store = new Store();
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -15,7 +18,7 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } },
 ]);
 
-let isLogin = false;
+const isLogin = store.get('isLogin');
 
 function createWindow() {
   // Create the browser window.
@@ -45,6 +48,7 @@ function createWindow() {
       // for more info
       webSecurity: false,
       nodeIntegration: true,
+      enableRemoteModule: true,
     },
   });
 
@@ -103,17 +107,15 @@ app.on('ready', async () => {
     // }
   }
   // 查询所有 cookies。
-  session.defaultSession.cookies.get({})
-    .then((cookies) => {
-      const cookieIsLogin = cookies.find((item) => item.name === 'isLogin');
-      if (cookieIsLogin && cookieIsLogin.value === 'true') {
-        isLogin = true;
-      }
-      createWindow();
-    }).catch((error) => {
-      console.log(error);
-      createWindow();
-    });
+  // session.defaultSession.cookies.get({})
+  //   .then((cookies) => {
+  //     console.log(cookies);
+  //     createWindow();
+  //   }).catch((error) => {
+  //     console.log(error);
+  //     createWindow();
+  //   });
+  createWindow();
 });
 
 // Exit cleanly on request from parent process in development mode.
@@ -187,10 +189,9 @@ ipcMain.on('winMax', (event) => {
 // 关闭窗口
 ipcMain.on('winClose', (_, args) => {
   if (args) {
-    console.log(1);
+    store.set('isLogin', false);
     win.destroy();
   } else {
-    console.log(2);
     // showLoginPage()
   }
 });

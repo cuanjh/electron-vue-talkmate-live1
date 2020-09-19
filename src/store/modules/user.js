@@ -6,6 +6,10 @@ import {
 import config from '@/utils/config';
 import cookie from '@/utils/cookie';
 
+const Store = window.require('electron-store');
+
+const store = new Store();
+
 const user = {
   namespaced: false,
   state: {
@@ -41,7 +45,7 @@ const user = {
             if (response.result) {
               cookie.setCookie('user_id', response.result.user_id);
               cookie.setCookie('verify', response.result.verify);
-              cookie.setCookie('isLogin', 'true');
+              store.set('isLogin', true);
               commit('SET_USERID', response.result.user_id);
               resolve(response);
             }
@@ -72,14 +76,13 @@ const user = {
       return new Promise((resolve) => {
         cookie.delCookie('user_id');
         cookie.delCookie('verify');
-        cookie.delCookie('isLogin');
+        store.set('isLogin', false);
         commit('SET_USERID', '');
         resolve();
         // userLogout()
         //   .then(() => {
         //     cookie.delCookie('user_id');
         //     cookie.delCookie('verify');
-        //     cookie.delCookie('isLogin');
         //     resolve();
         //   })
         //   .catch((error) => {
@@ -92,7 +95,7 @@ const user = {
       return new Promise((resolve) => {
         cookie.delCookie('user_id');
         cookie.delCookie('verify');
-        cookie.delCookie('isLogin');
+        store.set('isLogin', false);
         commit('SET_USERID', '');
         resolve();
       });

@@ -1,6 +1,6 @@
 <template>
   <div class="speaker">
-    <audio :src="audioUrl" ref="speakerAudio" controls></audio>
+    <audio ref="speakerAudio" controls></audio>
     <div class="desc"
       v-if="tabData.deviceName">
         · 检测到扬声器：{{ tabData.deviceName }}</div>
@@ -16,9 +16,9 @@
 </template>
 
 <script>
+// build打包后资源加载有问题，建议使用线上资源
 import AudioUrl from '@/assets/audio/testspeak.mp3';
 
-alert(AudioUrl);
 export default {
   props: ['tabData'],
   data() {
@@ -27,9 +27,10 @@ export default {
     };
   },
   mounted() {
-    if (this.$refs.speakerAudio) {
+    this.$refs.speakerAudio.src = 'https://icons.talkmate.com/static/audio/testspeak.mp3';
+    this.$refs.speakerAudio.oncanplay = () => {
       this.$refs.speakerAudio.play();
-    }
+    };
   },
   methods: {
     show() {
