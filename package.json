@@ -13,6 +13,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@rongcloud/imlib-v4": "^4.1.1",
     "axios": "^0.20.0",
     "chromedriver": "^84.0.1",
     "core-js": "^3.6.5",
@@ -26,7 +27,7 @@
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "qiniu-js": "^3.1.1",
-    "trtc-electron-sdk": "^7.6.300",
+    "trtc-electron-sdk": "^8.2.6",
     "vue": "^2.6.11",
     "vue-cli-plugin-electron-builder": "~2.0.0-rc.4",
     "vue-router": "^3.2.0",

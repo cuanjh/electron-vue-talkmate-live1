@@ -178,3 +178,33 @@ export const liveComment = (data) => {
   });
   return res;
 };
+
+// 值班---上课
+export const liveCourseOnline = (data) => {
+  const res = request({
+    url: urls.liveCourseOnlineUrl,
+    method: 'post',
+    data,
+  });
+  return res;
+};
+
+// 值班---下课
+export const liveCourseOffline = (data) => {
+  const res = request({
+    url: urls.liveCourseOfflineUrl,
+    method: 'post',
+    data,
+  });
+  return res;
+};
+
+// 直播评论列表
+export const liveCommentList = (data) => {
+  const res = request({
+    url: urls.liveCommentListUrl,
+    method: 'get',
+    data,
+  });
+  return res;
+};

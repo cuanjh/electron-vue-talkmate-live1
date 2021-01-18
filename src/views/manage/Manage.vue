@@ -71,7 +71,7 @@ export default {
       this.$store.dispatch('GetModuleList', {
         user_id: this.$store.getters.userId,
       }).then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res.success && res.data) {
           this.moduleList = [];
           this.summary.myCourse = res.data.length;

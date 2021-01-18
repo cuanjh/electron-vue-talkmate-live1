@@ -192,7 +192,7 @@ export default {
   },
   watch: {
     boardSize(nVal, oVal) {
-      console.log(nVal, oVal);
+      // console.log(nVal, oVal);
       if (nVal.width !== oVal.width || nVal.height !== oVal.height) {
         if (teduBoard) {
           teduBoard.resize();
@@ -220,7 +220,7 @@ export default {
   },
   methods: {
     show(params) {
-      console.log(params);
+      // console.log(params);
       this.resize();
       const initParams = {
         id: 'paint_box', // dom节点id
@@ -251,42 +251,42 @@ export default {
       // 撤销状态改变
       teduBoard.on(window.TEduBoard.EVENT.TEB_OPERATE_CANUNDO_STATUS_CHANGED, (enable) => {
         this.canUndo = enable ? 1 : 0;
-        console.log('======================:  ', 'TEB_OPERATE_CANUNDO_STATUS_CHANGED', enable ? '可撤销' : '不可撤销');
+        // console.log('===:  ', 'TEB_OPERATE_CANUNDO_STATUS_CHANGED', enable ? '可撤销' : '不可撤销');
       });
 
       // 重做状态改变
       teduBoard.on(window.TEduBoard.EVENT.TEB_OPERATE_CANREDO_STATUS_CHANGED, (enable) => {
         this.canRedo = enable ? 1 : 0;
-        console.log('======================:  ', 'TEB_OPERATE_CANREDO_STATUS_CHANGED', enable ? '可恢复' : '不可恢复');
+        // console.log('===:  ', 'TEB_OPERATE_CANREDO_STATUS_CHANGED', enable ? '可恢复' : '不可恢复');
       });
 
-      // 新增白板
-      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDBOARD, (boardIds, fid) => {
-        console.log('======================:  ', 'TEB_ADDBOARD', ' boardIds:', boardIds, ' fid:', fid);
+      // 新增白板 params(boardIds, fid)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDBOARD, () => {
+        // console.log('===:  ', 'TEB_ADDBOARD', ' boardIds:', boardIds, ' fid:', fid);
         this.proBoardData();
       });
 
       // 白板同步数据回调(收到该回调时需要将回调数据通过信令通道发送给房间内其他人，接受者收到后调用AddSyncData接口将数据添加到白板以实现数据同步)
       // TIC已经处理好了，可忽略该事件
-      teduBoard.on(window.TEduBoard.EVENT.TEB_SYNCDATA, (data) => {
-        console.log('======================:  ', 'TEB_SYNCDATA', data);
+      teduBoard.on(window.TEduBoard.EVENT.TEB_SYNCDATA, () => {
+        // console.log('======================:  ', 'TEB_SYNCDATA', data);
       });
 
       // 收到白板初始化完成事件后，表示白板已处于正常工作状态（此时白板为空白白板，历史数据尚未拉取完成）
       teduBoard.on(window.TEduBoard.EVENT.TEB_INIT, () => {
-        console.log('======================:  ', 'TEB_INIT');
-        console.log('TIC', 'onTEBInit finished');
+        // console.log('======================:  ', 'TEB_INIT');
+        // console.log('TIC', 'onTEBInit finished');
       });
 
       teduBoard.on(window.TEduBoard.EVENT.TEB_HISTROYDATA_SYNCCOMPLETED, () => {
-        console.log('======================:  ', 'TEB_HISTROYDATA_SYNCCOMPLETED');
-        console.log('TIC', 'onTEBHistory Sync Completed finished');
+        // console.log('======================:  ', 'TEB_HISTROYDATA_SYNCCOMPLETED');
+        // console.log('TIC', 'onTEBHistory Sync Completed finished');
       });
 
       // 白板错误回调
       teduBoard.on(window.TEduBoard.EVENT.TEB_ERROR, (code, msg) => {
         this.isShowPaintBox = false;
-        console.error('======================:  ', 'TEB_ERROR', ' code:', code, ' msg:', msg);
+        // console.error('======================:  ', 'TEB_ERROR', ' code:', code, ' msg:', msg);
         this.$message({
           type: 'error',
           message: `onTEBError code=${code} msg:${msg}`,
@@ -294,68 +294,68 @@ export default {
       });
       // 白板警告回调
       teduBoard.on(window.TEduBoard.EVENT.TEB_WARNING, (code, msg) => {
-        console.error('======================:  ', 'TEB_WARNING', ' code:', code, ' msg:', msg);
+        // console.error('======================:  ', 'TEB_WARNING', ' code:', code, ' msg:', msg);
         this.$message({
           type: 'error',
           message: `onTEBWarning code=${code} msg: ${msg}`,
         });
       });
 
-      // 图片状态加载回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_IMAGE_STATUS_CHANGED, (status, data) => {
-        console.log('======================:  ', 'TEB_IMAGE_STATUS_CHANGED', ' status:', status, ' data:', data);
+      // 图片状态加载回调 params(status, data)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_IMAGE_STATUS_CHANGED, () => {
+        // console.log('===:  ', 'TEB_IMAGE_STATUS_CHANGED', ' status:', status, ' data:', data);
       });
 
-      // 删除白板页回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_DELETEBOARD, (boardIds, fid) => {
-        console.log('======================:  ', 'TEB_DELETEBOARD', ' boardIds:', boardIds, ' fid:', fid);
+      // 删除白板页回调 params(boardIds, fid)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_DELETEBOARD, () => {
+        // console.log('===:  ', 'TEB_DELETEBOARD', ' boardIds:', boardIds, ' fid:', fid);
         this.proBoardData();
       });
 
-      // 跳转白板页回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_GOTOBOARD, (boardId, fid) => {
-        console.log('======================:  ', 'TEB_GOTOBOARD', ' boardId:', boardId, ' fid:', fid);
-        console.log(teduBoard.getFileInfo(fid));
+      // 跳转白板页回调 params(boardId, fid)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_GOTOBOARD, () => {
+        // console.log('===:  ', 'TEB_GOTOBOARD', ' boardId:', boardId, ' fid:', fid);
+        // console.log(teduBoard.getFileInfo(fid));
         this.proBoardData();
       });
 
-      // ppt动画步数改变回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_GOTOSTEP, (step, count) => {
-        console.log('======================:  ', 'TEB_GOTOSTEP', ' step:', step, ' count:', count);
+      // ppt动画步数改变回调 params(step, count)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_GOTOSTEP, () => {
+        // console.log('===:  ', 'TEB_GOTOSTEP', ' step:', step, ' count:', count);
       });
 
-      // 增加H5动画PPT文件回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDH5PPTFILE, (fid) => {
-        console.log('======================:  ', 'TEB_ADDH5PPTFILE', ' fid:', fid);
+      // 增加H5动画PPT文件回调 params(fid)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDH5PPTFILE, () => {
+        // console.log('======================:  ', 'TEB_ADDH5PPTFILE', ' fid:', fid);
         this.proBoardData();
       });
 
-      // 增加文件回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDFILE, (fid) => {
-        console.log('======================:  ', 'TEB_ADDFILE', ' fid:', fid);
+      // 增加文件回调params(fid)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDFILE, () => {
+        // console.log('======================:  ', 'TEB_ADDFILE', ' fid:', fid);
         this.proBoardData();
       });
 
-      // 增加转码文件回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDTRANSCODEFILE, (fid) => {
-        console.log('======================:  ', 'TEB_ADDTRANSCODEFILE', ' fid:', fid, teduBoard.getCurrentFile());
+      // 增加转码文件回调 params(fid)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDTRANSCODEFILE, () => {
+        // console.log('===:  ', 'TEB_ADDTRANSCODEFILE', ' fid:', fid, teduBoard.getCurrentFile());
         this.proBoardData();
       });
-      // 增加Images文件回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDIMAGESFILE, (fid) => {
-        console.log('======================:  ', 'TEB_ADDIMAGESFILE', ' fid:', fid);
-        this.proBoardData();
-      });
-
-      // 删除文件回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_DELETEFILE, (fid) => {
-        console.log('======================:  ', 'TEB_DELETEFILE', ' fid:', fid);
+      // 增加Images文件回调 params(fid)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDIMAGESFILE, () => {
+        // console.log('======================:  ', 'TEB_ADDIMAGESFILE', ' fid:', fid);
         this.proBoardData();
       });
 
-      // 文件上传状态
-      teduBoard.on(window.TEduBoard.EVENT.TEB_FILEUPLOADSTATUS, (status, data) => {
-        console.log('======================:  ', 'TEB_FILEUPLOADSTATUS', status, data);
+      // 删除文件回调 params(fid)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_DELETEFILE, () => {
+        // console.log('======================:  ', 'TEB_DELETEFILE', ' fid:', fid);
+        this.proBoardData();
+      });
+
+      // 文件上传状态 params(status, data)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_FILEUPLOADSTATUS, (status) => {
+        // console.log('======================:  ', 'TEB_FILEUPLOADSTATUS', status, data);
         if (status === 1) {
           this.notify('上传成功');
         } else {
@@ -364,39 +364,41 @@ export default {
         document.getElementById('file_input').value = '';
       });
 
-      // 切换文件回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_SWITCHFILE, (fid) => {
-        console.log('======================:  ', 'TEB_SWITCHFILE', ' fid:', fid);
+      // 切换文件回调 params(fid)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_SWITCHFILE, () => {
+        // console.log('======================:  ', 'TEB_SWITCHFILE', ' fid:', fid);
         this.proBoardData();
       });
 
-      // 上传背景图片的回调
-      teduBoard.on(window.TEduBoard.EVENT.TEB_SETBACKGROUNDIMAGE, (fileName, fileUrl, userData) => {
-        console.log('======================:  ', 'TEB_SETBACKGROUNDIMAGE', '  fileName:', fileName, '  fileUrl:', fileUrl, ' userData:', userData);
+      // 上传背景图片的回调 params(fileName, fileUrl, userData)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_SETBACKGROUNDIMAGE, () => {
+        // console.log('=:  ', 'TEB_SETBACKGROUNDIMAGE', '  fileName:', fileName,
+        // '  fileUrl:', fileUrl, ' userData:', userData);
       });
 
-      // 增加图片元素
-      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDIMAGEELEMENT, (fileName, fileUrl, userData) => {
-        console.log('======================:  ', 'TEB_ADDIMAGEELEMENT', '  fileName:', fileName, '  fileUrl:', fileUrl, ' userData:', userData);
+      // 增加图片元素 params(fileName, fileUrl, userData)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDIMAGEELEMENT, () => {
+        // console.log('===:  ', 'TEB_ADDIMAGEELEMENT', '  fileName:', fileName, '
+        // fileUrl:', fileUrl, ' userData:', userData);
       });
 
       // 文件上传进度
       teduBoard.on(window.TEduBoard.EVENT.TEB_FILEUPLOADPROGRESS, (data) => {
-        console.log('======================:  ', 'TEB_FILEUPLOADPROGRESS:: ', data);
+        // console.log('======================:  ', 'TEB_FILEUPLOADPROGRESS:: ', data);
         this.$message({
           type: 'success',
           message: `上传进度: ${parseInt(data.percent * 100, 10)}%`,
         });
       });
 
-      // H5背景加载状态
-      teduBoard.on(window.TEduBoard.EVENT.TEB_H5BACKGROUND_STATUS_CHANGED, (status, data) => {
-        console.log('======================:  ', 'TEB_H5BACKGROUND_STATUS_CHANGED:: status:', status, '  data:', data);
+      // H5背景加载状态 params(status, data)
+      teduBoard.on(window.TEduBoard.EVENT.TEB_H5BACKGROUND_STATUS_CHANGED, () => {
+        // console.log(':  ', 'TEB_H5BACKGROUND_STATUS_CHANGED:: status:', status, '  data:', data);
       });
 
       // 转码进度
       teduBoard.on(window.TEduBoard.EVENT.TEB_TRANSCODEPROGRESS, (res) => {
-        console.log('=======  TEB_TRANSCODEPROGRESS 转码进度：', JSON.stringify(res));
+        // console.log('=======  TEB_TRANSCODEPROGRESS 转码进度：', JSON.stringify(res));
         if (res.code) {
           this.$message({
             type: 'error',
@@ -446,7 +448,7 @@ export default {
                 pages: res.pages,
                 resolution: res.resolution,
               };
-              console.log('transcodeFile:', config);
+              // console.log('transcodeFile:', config);
               teduBoard.addTranscodeFile(config);
               break;
           }
@@ -458,12 +460,9 @@ export default {
       //   this.teduBoard.clear(false, true); // 清空选中的内容
       // });
 
-      // 监听增加元素事件
-      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDELEMENT, ({
-        id,
-        userData,
-      }) => {
-        console.log('id:', id, ' userData:', userData);
+      // 监听增加元素事件 params{id,userData,}
+      teduBoard.on(window.TEduBoard.EVENT.TEB_ADDELEMENT, () => {
+        // console.log('id:', id, ' userData:', userData);
       });
     },
     /**

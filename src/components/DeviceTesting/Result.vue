@@ -40,6 +40,9 @@ export default {
     completed() {
       this.$emit('handlerClick', { tab: 'result', event: 'complete' });
     },
+    clickHelp() {
+      // parent.window.openUrl(url);
+    },
     close() {},
   },
 };

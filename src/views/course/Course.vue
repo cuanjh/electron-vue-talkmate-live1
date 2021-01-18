@@ -202,7 +202,7 @@ export default {
     });
     if (this.activeIndex > 7) {
       const curDom = document.querySelectorAll('.days .item')[this.activeIndex - 1];
-      console.log(curDom.offsetLeft);
+      // console.log(curDom.offsetLeft);
       const offsetLeft = curDom.offsetLeft - 44;
       document.querySelector('.days').scrollLeft = offsetLeft;
     }
@@ -217,12 +217,13 @@ export default {
       const params = {
         start_date: `${this.year}-${this.addZero(this.month)}-01`,
         end_date: `${this.year}-${this.addZero(this.month)}-${this.days.length}`,
+        species: 0,
         page_index: 1,
         page_size: 9999,
         user_id: this.$store.getters.userId,
       };
       getLiveCourseList(params).then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res.success && res.data) {
           this.courseList = res.data;
         } else {
@@ -292,14 +293,14 @@ export default {
       }
     },
     entryClassroom(item) {
-      console.log(item);
+      // console.log(item);
       this.$store.commit('SET_CURLIVECOURSE', item);
       this.$refs.room.show();
       // parent.window.store.set('liveCourseInfo', JSON.stringify(item));
       // parent.window.entryClassroom();
     },
-    handlePlayback(item) {
-      console.log(item);
+    handlePlayback() {
+      // console.log(item);
     },
     switchDay(i, f) {
       if (!i) return;
@@ -307,7 +308,7 @@ export default {
       if (f) {
         const domObj = document.querySelector('.days');
         let sl = domObj.scrollLeft;
-        console.log('scrollLeft', sl);
+        // console.log('scrollLeft', sl);
         const dayObj = document.querySelectorAll('.days .item')[i - 1];
         const dayOffsetLeft = dayObj.offsetLeft;
         let flag = 'left';

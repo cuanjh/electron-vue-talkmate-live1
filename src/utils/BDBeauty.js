@@ -30,7 +30,7 @@ export default class BDBeauty {
         current: this.ruddiness,
       },
     };
-    console.log(helpOpt);
+    // console.log(helpOpt);
     return helpOpt;
   }
 

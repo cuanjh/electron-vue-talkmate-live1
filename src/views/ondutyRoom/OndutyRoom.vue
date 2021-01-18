@@ -1,43 +1,31 @@
 <template>
-  <transition name="fade" mode="out-in">
-    <div class="self-dialog" v-show="dialogVisible">
-      <div class="self-dialog-wrap">
-        <el-container class="live-room-container" direction="vertical">
-          <header-comp
-            :netWorkStatis="netWorkStatis"
-            :courseTitle="courseTitle"
-            :courseHMS="courseHMS"
-            @close="close"/>
-          <el-container>
-            <el-container direction="vertical">
-              <tiw-comp ref="tiw"/>
-              <footer-comp
-                :isScreenSharing="isScreenSharing"
-                @startLiveCountDown="startLiveCountDown"
-                @stopLive="stopLive"
-                @toggleScreenSharing="toggleScreenSharing">
-              </footer-comp>
-            </el-container>
-            <aside-comp ref="aside"></aside-comp>
-          </el-container>
-        </el-container>
-      </div>
-      <el-dialog
-        title="选择一个窗口"
-        :visible.sync="screensListVisiable"
-        :modal-append-to-body="false"
-        width="70%">
-        <screen-capture :list="screensList" v-bind:onClick="chooseWindowCapture"/>
-      </el-dialog>
-      <div id="count-down-layer" v-if="countDown > 0">
-        {{countDown}} 秒后开始直播
-      </div>
+  <el-container class="live-room-container" direction="vertical">
+    <header-comp
+      :netWorkStatis="netWorkStatis"
+      :courseTitle="courseTitle"
+      :courseHMS="courseHMS"
+      @close="close"/>
+    <el-container>
+      <el-container direction="vertical">
+        <video-comp ref="video" :muteLocalAudio="muteLocalAudio"/>
+        <footer-comp
+          :muteLocalAudio="muteLocalAudio"
+          @onMuteLocalAudio="onMuteLocalAudio"
+          @showBeautyDialog="showBeautyDialog"
+          @startLiveCountDown="startLiveCountDown"
+          @stopLive="stopLive">
+        </footer-comp>
+      </el-container>
+      <aside-comp ref="aside"></aside-comp>
+    </el-container>
+    <div id="count-down-layer" v-if="countDown > 0">
+      {{countDown}} 秒后开始直播
     </div>
-  </transition>
+    <rtc-beauty ref="beauty" @openBeauty="openBeauty"/>
+  </el-container>
 </template>
 
 <script>
-import TRTCCloud from 'trtc-electron-sdk';
 import {
   TRTCAppScene,
   TRTCVideoStreamType,
@@ -47,46 +35,46 @@ import {
   TRTCVideoEncParam,
   TRTCVideoResolution,
   TRTCVideoResolutionMode,
-  TRTCBeautyStyle,
+  // TRTCBeautyStyle,
   Rect,
   TRTCTranscodingConfig,
   TRTCTranscodingConfigMode,
   TRTCMixUser,
 } from 'trtc-electron-sdk/liteav/trtc_define';
-
-import trtcState from '@/utils/trtc-state';
-import rand from '@/utils/rand';
+import moment from 'moment';
 import Log from '@/utils/log';
-// import BDVideoEncode from '@/utils/BDVideoEncode';
-// import BDBeauty from '@/utils/BDBeauty';
-
+import trtcState from '@/utils/trtc-state';
 import {
   getUserSign,
   getLiveCourseRoomId,
+  liveCourseOnline,
+  liveCourseOffline,
 } from '@/api/live';
 
-import ScreenCapture from '@/components/ScreenCapture/ScreenCapture.vue';
-
+import RtcBeauty from '@/components/RtcBeauty/RtcBeauty.vue';
 import HeaderComp from './Header.vue';
+import VideoComp from './Video.vue';
 import AsideComp from './Aside.vue';
-import TiwComp from './TIW.vue';
 import FooterComp from './Footer.vue';
 
 const logger = new Log('tlRoom');
-let trtcCloud = null; // 用于TRTCQcloud 实例， mounted 时实体化
+const TRTCCloud = require('trtc-electron-sdk').default;
+
+let trtcCloud = null;
 
 export default {
   data() {
     return {
-      dialogVisible: false,
+      courseUUID: '',
       netWorkStatis: {
         uploss: 0,
         rtt: 0,
       },
+      videoWidth: 0,
+      videoHeight: 0,
       courseTitle: '体验课',
-      courseTimer: null,
       timeCount: 0,
-
+      courseTimer: null,
       userId: '',
       roomId: 0,
       sdkAppId: '',
@@ -94,11 +82,18 @@ export default {
       appId: '',
       bizId: '',
       videoContainer: null,
+      isPushing: false,
 
       muteLocalAudio: false,
       screensList: [],
       screensListVisiable: false,
       isScreenSharing: false,
+      beautyParams: {
+        style: 0,
+        beauty: 5,
+        white: 5,
+        ruddiness: 0,
+      },
       // 存放远程用户视频列表
       remoteVideos: {},
       isRemoteScreenSharing: false, // 远程用户是否正在分享屏幕
@@ -121,10 +116,16 @@ export default {
   },
   components: {
     HeaderComp,
+    VideoComp,
     AsideComp,
-    TiwComp,
     FooterComp,
-    ScreenCapture,
+    RtcBeauty,
+  },
+  mounted() {
+    this.init();
+    window.onresize = () => {
+      this.resize();
+    };
   },
   computed: {
     courseHMS() {
@@ -133,29 +134,24 @@ export default {
     },
   },
   methods: {
-    async show() {
-      const course = this.$store.getters.curLiveCourse;
+    async init() {
+      const course = this.$store.state.live.curOnduty;
+      this.courseUUID = course.uuid;
+      const startTime = moment(course.startTime * 1000).format('HH:mm:ss').slice(0, 5);
+      const endTime = moment(course.EndTime * 1000).format('HH:mm:ss').slice(0, 5);
+      this.courseTitle = `${startTime} - ${endTime}`;
       this.userId = this.$store.getters.userId;
-      if (course) {
-        this.courseTitle = course.title;
-        this.roomId = course.roomId;
-        if (!this.roomId) {
-          const res = await getLiveCourseRoomId({ uuid: course.uuid });
-          this.roomId = res.data.roomId;
-        }
-      } else {
-        this.roomId = rand(10000);
-      }
-      this.dialogVisible = true;
+      const res = await getLiveCourseRoomId({ uuid: course.uuid });
+      this.roomId = res.data.roomId;
 
       // 没有摄像头，有麦克风，可以音频
       if (trtcState.isCameraReady() === false) {
-        this.notify('找不到可用的摄像头，学生将无法看到您的画面。');
+        this.notify('找不到可用的摄像头，学生将无法看到您的画面。', 'warning');
       }
 
       // 有摄像头，没有麦克风，可以视频
       if (trtcState.isMicReady() === false) {
-        this.warn('找不到可用的麦克风，学生将无法听到您的声音。');
+        this.notify('找不到可用的麦克风，学生将无法听到您的声音。', 'warning');
       }
 
       // 2.获取计算签名
@@ -166,24 +162,23 @@ export default {
         this.appId = res2.data.appid;
         this.bizId = res2.data.bizid;
       }
-      this.$refs.tiw.show({ sdkAppId: this.sdkAppId, userSig: this.userSig, roomId: this.roomId });
       this.$refs.aside.show({ roomId: this.roomId });
       this.trtcReady();
     },
-    close() {
-      // 关闭采集音视频
-      trtcCloud.stopLocalPreview();
-      trtcCloud.stopLocalAudio();
-
-      // 清除状态
-      this.muteLocalVideo = false;
-      this.muteLocalAudio = false;
-      this.pkUsers = [];
-      // 释放资源
-      if (this.isScreenSharing) {
-        trtcCloud.stopScreenCapture();
+    resize() {
+      this.videoWidth = document.querySelector('#app').clientWidth - 400;
+      this.videoHeight = document.querySelector('#app').clientHeight - 160;
+      let width = this.videoWidth;
+      let height = parseInt((9 * width) / 16, 10);
+      if (height > this.videoHeight) {
+        height = this.videoHeight;
+        width = parseInt((16 * height) / 9, 10);
       }
-      this.dialogVisible = false;
+      if (width > this.videoWidth) {
+        width = this.videoWidth;
+        height = parseInt((9 * width) / 16, 10);
+      }
+      document.querySelector('.local-video-container').setAttribute('style', `width:${width}px; height:${height}px`);
     },
     trtcReady() {
       // 1. 获取用于承载视频的 HTMLElement；
@@ -237,7 +232,7 @@ export default {
        * 【推荐取值】 : Window 和 iMac 建议选择 640 × 360 及以上分辨率，resMode 选择 TRTCVideoResolutionModeLandscape
        * 【特别说明】 TRTCVideoResolution 默认只能横屏模式的分辨率，例如640 × 360。
        */
-      encParam.videoResolution = TRTCVideoResolution.TRTCVideoResolution_640_360;
+      encParam.videoResolution = TRTCVideoResolution.TRTCVideoResolution_960_540;
       /**
        * TRTCVideoResolutionMode
        *【字段含义】分辨率模式（横屏分辨率 - 竖屏分辨率）
@@ -252,7 +247,8 @@ export default {
 
       // 6. 开启美颜
       // setBeautyStyle 详细信息，请参考：https://trtc-1252463788.file.myqcloud.com/electron_sdk/docs/TRTCCloud.html#setBeautyStyle
-      trtcCloud.setBeautyStyle(TRTCBeautyStyle.TRTCBeautyStyleNature, 9, 9, 9);
+      trtcCloud.setBeautyStyle(this.beautyParams.style,
+        this.beautyParams.beauty, this.beautyParams.white, this.beautyParams.ruddiness);
 
       // 7. 显示摄像头画面和开房麦克风
       this.startCameraAndMic();
@@ -265,6 +261,7 @@ export default {
       // window.videoEncode = new BDVideoEncode(trtcCloud);
       // window.beauty = new BDBeauty(trtcCloud);
     },
+
     /**
     * 当进入房间时触发，显示摄像头画面，设置填充模式
     * @param {number} result - 进房结果， 大于 0 时，为进房间消耗的时间，这表示进进房成功。如果为 -1 ，则表示进房失败。
@@ -535,7 +532,12 @@ export default {
       trtcCloud.startLocalPreview(view);
       trtcCloud.startLocalAudio();
       trtcCloud.setLocalViewFillMode(TRTCVideoFillMode.TRTCVideoFillMode_Fill);
+      setTimeout(() => {
+        this.resize();
+      }, 100);
     },
+    // 设置视频窗口的大小
+    setVideoSize() {},
     /**
      * 倒计时3秒开始直播
      */
@@ -555,6 +557,10 @@ export default {
      * 开始直播，注意：进入房间会开始推流
      */
     startLive() {
+      this.timeCount = 0;
+      this.courseTimer = setInterval(() => {
+        this.timeCount += 1;
+      }, 1000);
       this.isPushing = true;
       // 进入房间便会开始推流
       // TRTCParams 详细说明，请查看文档：https://trtc-1252463788.file.myqcloud.com/electron_sdk/docs/TRTCParams.html
@@ -563,12 +569,15 @@ export default {
       param.userSig = this.userSig;
       param.roomId = this.roomId;
       param.userId = this.userId;
+      param.streamId = this.courseUUID;
       param.privateMapKey = ''; // 房间签名（非必填）7.1.157 版本以上（含），可以忽略此参数，7.1.157 之前的版本建议赋值为空字符串
       param.businessInfo = ''; // 业务数据（非必填）7.1.157 版本以上（含），可以忽略此参数，7.1.157 之前的版本建议赋值为空字符串
       // 直播场景下的角色，仅适用于直播场景（TRTCAppSceneLIVE 和 TRTCAppSceneVoiceChatRoom），
       // 视频通话场景下指定无效。默认值：主播（TRTCRoleAnchor）
       param.role = TRTCRoleType.TRTCRoleAnchor;
       trtcCloud.enterRoom(param, TRTCAppScene.TRTCAppSceneLIVE);
+      // 上课处理后端业务逻辑
+      liveCourseOnline({ uuid: this.courseUUID });
     },
 
     /**
@@ -581,131 +590,67 @@ export default {
       setTimeout(() => {
         // 推流结束后，继续观看本地画面
         this.startCameraAndMic();
+        // 下课
+        liveCourseOffline({ uuid: this.courseUUID });
+        clearInterval(this.courseTimer);
       }, 0);
     },
     /**
-     * 开启 / 关闭屏幕分享，开启时会弹出窗口选择列表
+     * 开启 / 关闭麦克风
      */
-    toggleScreenSharing() {
-      logger.log('toggleScreenSharing');
-      if (this.isScreenSharing === false) {
-        this.getScreensList();
-        logger.log('toggleScreenSharing, getScreenList');
+    onMuteLocalAudio() {
+      this.muteLocalAudio = !this.muteLocalAudio;
+      trtcCloud.muteLocalAudio(this.muteLocalAudio);
+    },
+    showBeautyDialog() {
+      this.$refs.beauty.show(this.beautyParams);
+    },
+    /**
+     * 开启美颜
+     */
+    openBeauty(params) {
+      this.beautyParams = {
+        style: params.style,
+        beauty: params.beauty,
+        white: params.white,
+        ruddiness: 0,
+      };
+      trtcCloud.setBeautyStyle(params.style, params.beauty, params.white, 0);
+    },
+    addZero(num) {
+      return num > 9 ? num : `0${num}`;
+    },
+    close() {
+      if (this.isPushing) {
+        this.notify('先停止下课，再退出直播间！', 'warning');
         return;
       }
-      this.isScreenSharing = false;
-      this.stopScreenShare();
-    },
-    /**
-     * 获取窗口列表，用于屏幕分享
-     */
-    getScreensList() {
-      // 获取窗口快照，这是资源消耗很高的函数，做个防抖，防频繁点击。
-      clearTimeout(this.getScreensTaskID);
-      const my = this;
-      this.getScreensTaskID = setTimeout(() => {
-        logger.log('getScreensList');
-        my.screensList = trtcCloud.getScreenCaptureSources(200, 160, 0, 0);
-        my.screensListVisiable = true;
-      }, 200);
-    },
-    /**
-     * 当在show-screen-capture 组件中选择了一个窗口快照后，会开始屏幕分享
-     */
-    chooseWindowCapture(event) {
-      const source = {
-        sourceId: event.currentTarget.dataset.id,
-        sourceName: event.currentTarget.dataset.name,
-        type: parseInt(event.currentTarget.dataset.type, 10),
-      };
-      logger.log('chooseWindowCapture:', source);
-      this.startScreenShare(source);
-      this.screensListVisiable = false;
-      this.isScreenSharing = true;
-    },
-    /**
-     * 开始屏幕分享
-     */
-    startScreenShare(source) {
-      logger.log('startScreenShare');
-      const encparam = new TRTCVideoEncParam();
-      encparam.videoResolution = TRTCVideoResolution.TRTCVideoResolution_1280_720;
-      encparam.resMode = TRTCVideoResolutionMode.TRTCVideoResolutionModeLandscape;
-      encparam.videoFps = 15;
-      encparam.videoBitrate = 600;
-      trtcCloud.setSubStreamEncoderParam(encparam);
+      this.$refs.aside.close();
+      // 关闭采集音视频
+      trtcCloud.stopLocalPreview();
+      trtcCloud.stopLocalAudio();
 
-      const rect = new Rect();
-      rect.top = 0; // 左坐标
-      rect.left = 0; // 上坐标
-      rect.width = 0; // 宽度
-      rect.height = 0; // 高度
-      trtcCloud.selectScreenCaptureTarget(source.type, source.sourceId, source.sourceName,
-        rect, true, true);
-      trtcCloud.startScreenCapture();
+      // 清除状态
+      this.muteLocalVideo = false;
+      this.muteLocalAudio = false;
+      this.pkUsers = [];
+      this.$router.push({ path: '/onduty/rili' });
     },
-    /**
-    * 暂停屏幕分享
-    */
-    pauseScreenShare() {
-      logger.log('pauseScreenShare');
-      trtcCloud.pauseScreenCapture();
-    },
-    /**
-     * 恢复屏幕分享
-     */
-    resumeScreenShare() {
-      logger.log('resumeScreenShare');
-      trtcCloud.resumeScreenCapture();
-      this.isScreenSharingPlaying = true;
-    },
-    /**
-     * 停止屏幕分享
-     */
-    stopScreenShare() {
-      logger.log('stopScreenShare');
-      trtcCloud.stopScreenCapture();
-      this.isScreenSharing = false;
-      this.videoTypeSetting();
-    },
-    addZero(i) {
-      return i < 10 ? `0${i}` : i.toString();
-    },
-    notify(msg, t = 'success') {
+    notify(msg, type = 'success', title = '提示') {
       this.$message({
+        showClose: true,
+        title,
         message: msg,
-        type: t,
+        type,
         offset: 250,
       });
-    },
-    handleClose(done) {
-      this.$confirm('确认关闭？')
-        .then(() => {
-          done();
-        })
-        .catch(() => {});
     },
   },
 };
 </script>
 
 <style lang="less" scoped>
-.self-dialog {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, .4);
-  z-index: 999;
-  &-wrap {
-    width: 100%;
-    height: 100%;
-    background: #ffffff;
-  }
-}
-
-.el-container {
+.live-room-container {
   position: relative;
   background: #FAFBFF;
   height: 100%;
@@ -730,12 +675,6 @@ export default {
   text-align: center;
   line-height: 14vh;
   overflow: hidden;
-}
-</style>
-
-<style lang="less">
-.local-video-container {
-  width: 320px;
-  height: 180px;
+  z-index: 99;
 }
 </style>

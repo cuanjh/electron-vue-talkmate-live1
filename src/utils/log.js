@@ -17,18 +17,18 @@ export default class Log {
   log(...params) {
     const param = Array.from(params);
     this.setPrefix(param);
-    console.log(console, param);
+    // console.log(console, param);
   }
 
   warn(...params) {
     const param = Array.from(params);
     this.setPrefix(param);
-    console.warn(console, param);
+    // console.warn(console, param);
   }
 
   error(...params) {
     const param = Array.from(params);
     this.setPrefix(param);
-    console.error(console, param);
+    // console.error(console, param);
   }
 }

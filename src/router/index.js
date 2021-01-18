@@ -19,6 +19,11 @@ const routes = [
     hidden: true,
   },
   {
+    path: '/onduty/room',
+    component: () => import(/* webpackChunkName: "onduty-room" */ '@/views/ondutyRoom/OndutyRoom.vue'),
+    hidden: true,
+  },
+  {
     path: '/course',
     component: Layout,
     redirect: '/rili',
@@ -65,6 +70,18 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/onduty',
+    component: Layout,
+    redirect: '/rili',
+    name: 'OndutyRili',
+    children: [
+      {
+        path: 'rili',
+        component: () => import(/* webpackChunkName: "onduty" */ '@/views/onduty/Onduty'),
+      },
+    ],
+  },
   { path: '*', redirect: '/404', hidden: true },
 ];
 
@@ -77,5 +94,10 @@ const router = new VueRouter({
   }),
   routes,
 });
+
+const originalPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch((err) => err);
+};
 
 export default router;

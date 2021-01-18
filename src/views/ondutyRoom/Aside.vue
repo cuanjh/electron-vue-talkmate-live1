@@ -1,9 +1,5 @@
 <template>
   <el-aside width="320px">
-    <div class="video-container">
-      <div class="control" id="video_wrap"></div>
-      <i class="muted" v-show="muteLocalAudio"></i>
-    </div>
     <div class="chat-container">
       <div class="title">
         聊天
@@ -13,7 +9,7 @@
           <div class="message-list-wrap">
             <div class="message-box" v-for="(m, index) in msgs" :key="'msg' + index">
               <div v-if="m.extra">
-                <div class="message-item" v-if="m.extra.coins == 0">
+                <div class="message-item" v-if="parseInt(m.extra.coins) == 0">
                   <el-avatar :size="24" :src="m.extra.photo"></el-avatar>
                   <div class="content">
                     <span
@@ -59,74 +55,78 @@
 import {
   getIMUserToken,
   liveComment,
+  liveCommentList,
 } from '@/api/live';
+
+import * as RongIMLib from '@rongcloud/imlib-v4';
+
+const config = {
+  appkey: 'qf3d5gbjqhonh',
+};
+const ryim = RongIMLib.init(config);
 
 export default {
   props: ['muteLocalAudio'],
   data() {
     return {
-      roomId: '',
+      course: null,
       chatMsg: '',
       ryim: null,
       ryChatRoom: null,
+      ryToken: '',
+      conversation: null,
       disableSendMsg: false,
       msgs: [],
     };
   },
+  mounted() {
+    this.msgs = [];
+    this.course = this.$store.state.live.curOnduty;
+    liveCommentList({
+      courseUUID: this.course.uuid,
+      startTime: this.course.startTime,
+      endTime: (new Date()).getTime(),
+    }).then((r) => {
+      if (r.data && r.data.length > 0) {
+        r.data.forEach((item) => {
+          const extra = {
+            coins: item.coins,
+            role: item.role,
+            userName: item.authorInfo.nickname,
+            photo: item.authorInfo.photo,
+          };
+          const obj = {
+            content: item.comment,
+            extra,
+          };
+          this.msgs.push(obj);
+        });
+      }
+    });
+  },
   methods: {
-    show(params) {
-      this.roomId = params.roomId;
+    show() {
       this.initRongyun();
     },
-    // 发送消息
-    sendMsg() {
-      if (!this.chatMsg) return;
-      const obj = {
-        role: 'teacher',
-        isMember: 0,
-        coins: 0,
-        photo: this.$store.getters.photo,
-        userName: this.$store.getters.userInfo.live_nickname,
-      };
-      this.ryChatRoom.send({
-        messageType: 'app:ChatroomMsgv1', // 填写开发者定义的 messageType
-        content: { // 填写开发者定义的消息内容
-          content: this.chatMsg,
-          extra: JSON.stringify(obj),
-        },
-        isPersited: true, // 是否存储在服务端,默认为 true
-        isCounted: true, // 是否计数. 计数消息接收端接收后未读数加 1，默认为 true
-      }).then((message) => {
-        // console.log('发送 app:ChatroomMsgv1 消息成功', message);
-        this.msgs.push({
-          content: message.content.content,
-          extra: JSON.parse(message.content.extra, 10),
-        });
-        liveComment({
-          courseUUID: this.roomId,
-          comment: this.chatMsg,
-          coins: 0,
-          teacherUserId: this.$store.getters.userId,
-        });
-        this.chatMsg = '';
-      });
+    close() {
+      this.quitChatRoom();
+      this.disconnectRY();
     },
     // 初始化融云
     initRongyun() {
-      const config = {
-        appkey: 'qf3d5gbjqhonh',
-        debug: true,
-      };
-      this.ryim = window.RongIMLib.init(config);
-      this.ryChatRoom = this.ryim.ChatRoom.get({
-        id: this.roomId.toString(),
+      this.ryChatRoom = ryim.ChatRoom.get({
+        id: this.course.uuid,
       });
+      // this.ryChatRoom.getInfo().then((result) => {
+      //   console.log(result);
+      // });
       const conversationList = []; // 当前已存在的会话列表
-      this.msgs = [];
-      this.ryim.watch({
+      // 添加事件监听
+      ryim.watch({
+        // 检查回话列表变更事件
         conversation: (event) => {
           const ucl = event.updatedConversationList; // 更新的会话列表
-          this.ryim.Conversation.merge({
+          ryim.Conversation.merge({
             conversationList,
             ucl,
           });
@@ -155,7 +155,7 @@ export default {
     // 连接融云服务器
     connectRY() {
       // im 来自 RongIMLib.init 返回的实例，例如：var im = RongIMLib.init({ appkey: ' ' });
-      this.ryim.connect({ token: this.ryToken }).then(() => {
+      ryim.connect({ token: this.ryToken }).then(() => {
         // console.log('链接成功, 链接用户 id 为: ', user.id);
         this.joinChatRoom();
       }).catch(() => {
@@ -164,14 +164,14 @@ export default {
     },
     // 断开连接融云服务器
     disconnectRY() {
-      this.ryim.disconnect().then(() => {
+      ryim.disconnect().then(() => {
         // console.log('断开链接成功');
       });
     },
     // 加入聊天室
     joinChatRoom() {
       this.ryChatRoom.join({
-        count: 20,
+        count: -1,
       }).then(() => {
         // console.log('加入聊天室成功');
       });
@@ -180,6 +180,39 @@ export default {
     quitChatRoom() {
       this.ryChatRoom.quit().then(() => {
         // console.log('退出聊天室成功');
+      });
+    },
+    // 发送消息
+    sendMsg() {
+      if (!this.chatMsg) return;
+      const obj = {
+        role: 'teacher',
+        isMember: 0,
+        coins: 0,
+        photo: this.$store.getters.photo,
+        userName: this.$store.getters.userInfo.nickname,
+      };
+      this.ryChatRoom.send({
+        messageType: 'app:ChatroomMsgv1', // 填写开发者定义的 messageType
+        content: { // 填写开发者定义的消息内容
+          content: this.chatMsg,
+          extra: JSON.stringify(obj),
+        },
+        isPersited: true, // 是否存储在服务端,默认为 true
+        isCounted: true, // 是否计数. 计数消息接收端接收后未读数加 1，默认为 true
+      }).then((message) => {
+        // console.log('发送 app:ChatroomMsgv1 消息成功', message);
+        this.msgs.push({
+          content: message.content.content,
+          extra: JSON.parse(message.content.extra, 10),
+        });
+        liveComment({
+          courseUUID: this.course.uuid,
+          comment: this.chatMsg,
+          coins: 0,
+          teacherUserId: this.$store.getters.userId,
+        });
+        this.chatMsg = '';
       });
     },
   },
@@ -194,36 +227,6 @@ export default {
   z-index: 1;
   display: flex;
   flex-direction: column;
-}
-
-.video-container {
-  position: relative;
-}
-
-#video_wrap {
-  /* margin: 0 5px; */
-  flex-wrap: wrap;
-  display: flex;
-  width: 320px;
-  height: 180px;
-  background: rgba(153,153,153,1);
-}
-
-.video-container .muted {
-  display: inline-block;
-  width: 26px;
-  height: 26px;
-  background-image: url('../../assets/images/room/icon-muted.svg');
-  background-repeat: no-repeat;
-  background-size: cover;
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-}
-
-.video_view {
-  width: 320px;
-  height: 180px;
 }
 
 .chat-container {

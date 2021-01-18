@@ -12,6 +12,7 @@
       <div class="nav-menu">
         <div class="nav-item" v-for="(item, index) in menus" :key="index">
           <div
+            v-show="isShowMenu(item.key)"
             :class="['nav-category', { active: $route.path.indexOf(item.key) > -1 }]"
             @click="switchMenu(item.key)"
           >
@@ -51,6 +52,7 @@ export default {
       menus: [
         { key: 'course', text: '课程日历', iconCls: 'course' },
         { key: 'manage', text: '我的课程', iconCls: 'manage' },
+        { key: 'onduty', text: '值班日历', iconCls: 'course' },
       ],
     };
   },
@@ -59,10 +61,10 @@ export default {
     ScrollBar,
   },
   mounted() {
-    console.log(this.$route.path);
+    // console.log(this.$route.path);
   },
   computed: {
-    ...mapGetters(['sidebar', 'verifyStatus', 'photo']),
+    ...mapGetters(['sidebar', 'verifyStatus', 'photo', 'userInfo']),
     routes() {
       return this.$router.options.routes;
     },
@@ -74,6 +76,19 @@ export default {
     clickUserPhoto() {
       this.setting();
     },
+    isShowMenu(key) {
+      // console.log(key);
+      let ret = false;
+      const role = this.userInfo.role.split(',');
+      if (role.includes('1') && role.includes('2')) {
+        ret = true;
+      } else if (role.includes('1')) {
+        ret = (key === 'course' || key === 'manage');
+      } else if (role.includes('2')) {
+        ret = (key === 'onduty');
+      }
+      return ret;
+    },
     switchMenu(key) {
       this.activeMenu = key;
       switch (key) {
@@ -84,6 +99,10 @@ export default {
         // 我的课程
         case 'manage':
           this.$router.push({ path: '/manage/module' });
+          break;
+        // 值班日历
+        case 'onduty':
+          this.$router.push({ path: '/onduty/rili' });
           break;
         default:
           break;

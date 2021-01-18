@@ -241,12 +241,12 @@ export default {
           const o = b.is_hot - a.is_hot;
           return o;
         });
-        console.log(this.langs);
+        // console.log(this.langs);
       }
     });
 
     if (this.userInfo) {
-      console.log(this.userInfo);
+      // console.log(this.userInfo);
       this.status = this.userInfo.status;
       this.ruleForm.user_id = this.userInfo.user_id;
       this.ruleForm.photo = this.userInfo.photo;
@@ -307,7 +307,7 @@ export default {
           }
           return true;
         }
-        console.log('error submit!!');
+        // console.log('error submit!!');
         return false;
       });
     },
@@ -326,7 +326,7 @@ export default {
       const ext = file.name.substring(i + 1);
       const url = `liveroom/images/${dateStr}/${file.uid}.${ext}`;
       uploadQiniu(file.raw, this.token, url).then((res) => {
-        console.log(this.uploadDomain + res.key);
+        // console.log(this.uploadDomain + res.key);
         this.$set(this.ruleForm, feild, res.key);
       });
     },

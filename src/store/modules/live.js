@@ -6,8 +6,12 @@ const live = {
     teacherInfo: null,
     moduleList: [],
     curLiveCourse: null,
+    curOnduty: null,
   },
   mutations: {
+    SET_LIVEINFO: (state, params) => {
+      state[params.key] = params.value;
+    },
     SET_TEACHERINFO: (state, teacherInfo) => {
       state.teacherInfo = teacherInfo;
     },

@@ -152,7 +152,7 @@ export default {
       }).then(() => {
         const identifyInfo = this.$store.getters.userInfo;
         if (identifyInfo) {
-          console.log(identifyInfo);
+          // console.log(identifyInfo);
           this.status = identifyInfo.status;
           if (this.status === 2) {
             this.title = '审核不通过';

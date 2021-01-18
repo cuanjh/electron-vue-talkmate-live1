@@ -79,7 +79,7 @@ export default {
       const ret = f.code === c;
       return ret;
     });
-    console.log(this.moduleInfo);
+    // console.log(this.moduleInfo);
   },
   methods: {
     formatCourseDate(c) {

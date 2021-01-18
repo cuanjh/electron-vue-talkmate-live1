@@ -79,7 +79,7 @@ export default {
       time: 60,
       timer: null, // 定时器
       loginForm: {
-        phone: '13810413536',
+        phone: '',
         verifyCode: '',
       },
       loginRules: {
@@ -162,7 +162,7 @@ export default {
           });
           return true;
         }
-        console.log('error submit!!');
+        // console.log('error submit!!');
         return false;
       });
     },

@@ -110,7 +110,7 @@ export default {
     loadFiles() {
       this.courseFiles = [];
       courseFileList({ live_uuid: this.$store.getters.curLiveCourse.uuid }).then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res.success && res.data) {
           this.courseFiles = res.data;
         }
@@ -123,7 +123,7 @@ export default {
       this.dialogVisibleFiles = false;
     },
     changeUploadFile(file) {
-      console.log(file);
+      // console.log(file);
       const date = new Date();
       const dateStr = moment(date).format('YYYY/MM/DD');
       const i = file.name.lastIndexOf('.');
@@ -161,7 +161,7 @@ export default {
           title: file.name,
           type: fileType,
         };
-        console.log(obj);
+        // console.log(obj);
         createFilesTranscode(obj).then((r) => {
           this.loadFiles();
           if (r.success && r.data) {
@@ -174,7 +174,7 @@ export default {
                   }
                 }
               });
-              console.log('timerFiles');
+              // console.log('timerFiles');
             }, 5000);
           }
         });
@@ -193,7 +193,7 @@ export default {
         pages: row.event_data.pages,
         resolution: row.event_data.resolution,
       };
-      console.log('transcodeFile:', config);
+      // console.log('transcodeFile:', config);
       this.$emit('openFile', config);
       this.dialogVisibleFiles = false;
     },

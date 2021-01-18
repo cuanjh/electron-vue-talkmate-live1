@@ -32,9 +32,9 @@ const uploadQiniu = (file, token, key) => {
 
     observable.subscribe({
       next: (response) => {
-        console.log(response);
+        // console.log(response);
         const chunksCopy = response.chunks || [];
-        const totalCopy = response.total;
+        // const totalCopy = response.total;
         // 这里对每个chunk更新进度，并记录已经更新好的避免重复更新，
         // 同时对未开始更新的跳过
         for (let i = 0; i < chunksCopy.length; i += 1) {
@@ -49,9 +49,9 @@ const uploadQiniu = (file, token, key) => {
           if (chunksCopy[i].percent === 100) {
             finishedAttr[i] = true;
           }
-          console.log(`${chunksCopy[i].percent}%`);
+          // console.log(`${chunksCopy[i].percent}%`);
         }
-        console.log(`进度：${totalCopy.percent}%`);
+        // console.log(`进度：${totalCopy.percent}%`);
         compareChunks = chunksCopy;
       },
       error: (err) => {
@@ -62,9 +62,9 @@ const uploadQiniu = (file, token, key) => {
         resolve(res);
       },
     });
-  }, (error) => {
+  }, () => {
     closeLoading();
-    console.log(error);
+    // console.log(error);
   });
 };
 

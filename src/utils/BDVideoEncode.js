@@ -38,12 +38,12 @@ export default class BDVideoEncode {
         current: this.encParam.enableAdjustRes,
       },
     };
-    console.log(helpOpt);
+    // console.log(helpOpt);
     return helpOpt;
   }
 
   update() {
-    console.log('setVideoEncoderParam', this.encParam);
+    // console.log('setVideoEncoderParam', this.encParam);
     this.trtc.setVideoEncoderParam(this.encParam);
   }
 

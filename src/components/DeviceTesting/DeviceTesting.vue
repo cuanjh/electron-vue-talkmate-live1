@@ -36,7 +36,7 @@ import Mic from './Mic.vue';
 import Camera from './Camera.vue';
 import Result from './Result.vue';
 
-const TRTCCloud = require('trtc-electron-sdk');
+const TRTCCloud = require('trtc-electron-sdk').default;
 const {
   TRTCDeviceType,
   TRTCDeviceState,
@@ -126,21 +126,24 @@ export default {
       this.$refs[this.view].close();
     },
     subscribeEvents(rtcCloud) {
-      rtcCloud.on('onError', (errcode, errmsg) => {
-        console.error(`trtc_demo: onError: ${errcode}msg: ${errmsg}`);
+      // errcode, errmsg
+      rtcCloud.on('onError', () => {
+        // console.error(`trtc_demo: onError: ${errcode}msg: ${errmsg}`);
       });
-      rtcCloud.on('onWarning', (warncode, warnmsg) => {
-        console.warn(`trtc_demo: onWarning: ${warncode} msg:${warnmsg}`);
+      // warncode, warnmsg
+      rtcCloud.on('onWarning', () => {
+        // console.warn(`trtc_demo: onWarning: ${warncode} msg:${warnmsg}`);
       });
       // 麦克风音量回调监听
       rtcCloud.on('onTestMicVolume', (volume) => {
         this.testMicVolume = volume;
-        console.log(this.testMicVolume);
+        // console.log(this.testMicVolume);
       });
       // 设备状态监控回调
       rtcCloud.on('onDeviceChange', (deviceId, type, state) => {
         // 实时监控本地设备的拔插
-        console.info(`trtc_demo: onDeviceChange deviceId: ${deviceId} |type: ${type} |state: ${state}`);
+        // console.info(`trtc_demo: onDeviceChange
+        // deviceId: ${deviceId} |type: ${type} |state: ${state}`);
         if (type === TRTCDeviceType.TRTCDeviceTypeCamera) {
           this.cameraList = this.rtcCloud.getCameraDevicesList();
           let select = false;
@@ -216,7 +219,7 @@ export default {
       this.testBGM = false;
     },
     handlerClick(params) {
-      console.log(params);
+      // console.log(params);
       switch (params.tab) {
         case 'speaker':
           this.testedSpeaker = true;
@@ -302,7 +305,7 @@ export default {
         this.micDeviceName = this.micList[0].deviceName;
       }
       this.speakerList = this.rtcCloud.getSpeakerDevicesList();
-      console.log('speakerList', this.speakerList);
+      // console.log('speakerList', this.speakerList);
       if (this.speakerList.length > 0) {
         this.speakerDeviceName = this.speakerList[0].deviceName;
       }
@@ -352,10 +355,6 @@ export default {
       this.testCamera = flag;
       this.testedCamera = true;
       this.switchStep(3);
-    },
-    clickHelp(url) {
-      console.log(url);
-      // parent.window.openUrl(url)
     },
     completed() {
       this.playSpeakerAudio(false);

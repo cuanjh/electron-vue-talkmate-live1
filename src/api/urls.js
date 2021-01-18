@@ -27,6 +27,9 @@ const urls = {
   describeOnlineRecordUrl: '/baiban/course_videos/describe_online_record',
   createIMGroupUrl: '/baiban/groups/creates',
   destroyIMGroupUrl: '/baiban/groups/destroy',
+  liveCourseOnlineUrl: '/baiban/live_course/online',
+  liveCourseOfflineUrl: '/baiban/live_course/offline',
+  liveCommentListUrl: '/disv1/live/comment/list',
 };
 
 export default urls;
