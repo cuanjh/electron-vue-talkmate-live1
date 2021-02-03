@@ -5,9 +5,9 @@ const config = {
   uploadDomain: 'https://uploadfile1.talkmate.com/',
 };
 
-if (process.env === 'production') {
+if (true) {
   config.appSecret = '5EAE76C6323C85D2E35D4817020D84C9';
-  config.apiDomain = 'http://api.talkmate.com';
+  config.apiDomain = 'https://pre-api.talkmate.com';
 }
 
 export default config;

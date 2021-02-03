@@ -58,13 +58,6 @@ import {
   liveCommentList,
 } from '@/api/live';
 
-import * as RongIMLib from '@rongcloud/imlib-v4';
-
-const config = {
-  appkey: 'qf3d5gbjqhonh',
-};
-const ryim = RongIMLib.init(config);
-
 export default {
   props: ['muteLocalAudio'],
   data() {
@@ -101,6 +94,7 @@ export default {
           };
           this.msgs.push(obj);
         });
+        this.initRongyun();
       }
     });
   },
@@ -112,21 +106,55 @@ export default {
       this.quitChatRoom();
       this.disconnectRY();
     },
+    // 发送消息
+    sendMsg() {
+      if (!this.chatMsg) return;
+      const obj = {
+        role: 'teacher',
+        isMember: 0,
+        coins: 0,
+        photo: this.$store.getters.photo,
+        userName: this.$store.getters.userInfo.live_nickname,
+      };
+      this.ryChatRoom.send({
+        messageType: 'app:ChatroomMsgv1', // 填写开发者定义的 messageType
+        content: { // 填写开发者定义的消息内容
+          content: this.chatMsg,
+          extra: JSON.stringify(obj),
+        },
+        isPersited: true, // 是否存储在服务端,默认为 true
+        isCounted: true, // 是否计数. 计数消息接收端接收后未读数加 1，默认为 true
+      }).then((message) => {
+        // console.log('发送 app:ChatroomMsgv1 消息成功', message);
+        this.msgs.push({
+          content: message.content.content,
+          extra: JSON.parse(message.content.extra, 10),
+        });
+        liveComment({
+          courseUUID: this.course.uuid,
+          comment: this.chatMsg,
+          coins: 0,
+          teacherUserId: this.$store.getters.userId,
+        });
+        this.chatMsg = '';
+      });
+    },
     // 初始化融云
     initRongyun() {
-      this.ryChatRoom = ryim.ChatRoom.get({
+      const config = {
+        appkey: 'qf3d5gbjqhonh',
+        debug: true,
+      };
+      this.ryim = window.RongIMLib.init(config);
+      this.ryChatRoom = this.ryim.ChatRoom.get({
         id: this.course.uuid,
       });
-      // this.ryChatRoom.getInfo().then((result) => {
-      //   console.log(result);
-      // });
       const conversationList = []; // 当前已存在的会话列表
-      // 添加事件监听
-      ryim.watch({
-        // 检查回话列表变更事件
+      this.msgs = [];
+      this.ryim.watch({
         conversation: (event) => {
           const ucl = event.updatedConversationList; // 更新的会话列表
-          ryim.Conversation.merge({
+          this.ryim.Conversation.merge({
             conversationList,
             ucl,
           });
@@ -155,7 +183,7 @@ export default {
     // 连接融云服务器
     connectRY() {
       // im 来自 RongIMLib.init 返回的实例，例如：var im = RongIMLib.init({ appkey: ' ' });
-      ryim.connect({ token: this.ryToken }).then(() => {
+      this.ryim.connect({ token: this.ryToken }).then(() => {
         // console.log('链接成功, 链接用户 id 为: ', user.id);
         this.joinChatRoom();
       }).catch(() => {
@@ -164,14 +192,14 @@ export default {
     },
     // 断开连接融云服务器
     disconnectRY() {
-      ryim.disconnect().then(() => {
+      this.ryim.disconnect().then(() => {
         // console.log('断开链接成功');
       });
     },
     // 加入聊天室
     joinChatRoom() {
       this.ryChatRoom.join({
-        count: -1,
+        count: 20,
       }).then(() => {
         // console.log('加入聊天室成功');
       });
@@ -180,39 +208,6 @@ export default {
     quitChatRoom() {
       this.ryChatRoom.quit().then(() => {
         // console.log('退出聊天室成功');
-      });
-    },
-    // 发送消息
-    sendMsg() {
-      if (!this.chatMsg) return;
-      const obj = {
-        role: 'teacher',
-        isMember: 0,
-        coins: 0,
-        photo: this.$store.getters.photo,
-        userName: this.$store.getters.userInfo.nickname,
-      };
-      this.ryChatRoom.send({
-        messageType: 'app:ChatroomMsgv1', // 填写开发者定义的 messageType
-        content: { // 填写开发者定义的消息内容
-          content: this.chatMsg,
-          extra: JSON.stringify(obj),
-        },
-        isPersited: true, // 是否存储在服务端,默认为 true
-        isCounted: true, // 是否计数. 计数消息接收端接收后未读数加 1，默认为 true
-      }).then((message) => {
-        // console.log('发送 app:ChatroomMsgv1 消息成功', message);
-        this.msgs.push({
-          content: message.content.content,
-          extra: JSON.parse(message.content.extra, 10),
-        });
-        liveComment({
-          courseUUID: this.course.uuid,
-          comment: this.chatMsg,
-          coins: 0,
-          teacherUserId: this.$store.getters.userId,
-        });
-        this.chatMsg = '';
       });
     },
   },
