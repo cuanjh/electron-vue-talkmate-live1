@@ -105,6 +105,11 @@ export default {
 <style lang="less" scoped>
 .el-container {
   background: #ffffff;
+  -webkit-app-region: drag;
+}
+
+.el-main {
+  -webkit-app-region: no-drag;
 }
 
 .item {

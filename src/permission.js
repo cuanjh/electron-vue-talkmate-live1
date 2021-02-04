@@ -29,6 +29,8 @@ router.beforeEach((to, from, next) => {
         .then(() => {
           // 拉取用户信息
           let path = '';
+          const { role } = store.getters.userInfo;
+          const roles = role.split(',');
           switch (store.getters.verifyStatus) {
             case 0:
               path = '/verify/edit';
@@ -39,6 +41,9 @@ router.beforeEach((to, from, next) => {
               break;
             default:
               path = '/course/rili';
+              if (roles.length === 1 && roles.includes('2')) {
+                path = '/onduty/rili';
+              }
               break;
           }
           next(path);
