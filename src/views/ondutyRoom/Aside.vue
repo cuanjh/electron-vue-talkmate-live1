@@ -57,6 +57,9 @@ import {
   liveComment,
   liveCommentList,
 } from '@/api/live';
+import config from '@/utils/config';
+
+const RongIMLib = require('@rongcloud/imlib-v4');
 
 export default {
   props: ['muteLocalAudio'],
@@ -80,6 +83,7 @@ export default {
       startTime: this.course.startTime,
       endTime: (new Date()).getTime(),
     }).then((r) => {
+      console.log(r);
       if (r.data && r.data.length > 0) {
         r.data.forEach((item) => {
           const extra = {
@@ -94,7 +98,6 @@ export default {
           };
           this.msgs.push(obj);
         });
-        this.initRongyun();
       }
     });
   },
@@ -105,6 +108,9 @@ export default {
     close() {
       this.quitChatRoom();
       this.disconnectRY();
+    },
+    getExistedConversationList() {
+      return this.msgs;
     },
     // 发送消息
     sendMsg() {
@@ -122,8 +128,8 @@ export default {
           content: this.chatMsg,
           extra: JSON.stringify(obj),
         },
-        isPersited: true, // 是否存储在服务端,默认为 true
-        isCounted: true, // 是否计数. 计数消息接收端接收后未读数加 1，默认为 true
+        // isPersited: true, // 是否存储在服务端,默认为 true
+        // isCounted: true, // 是否计数. 计数消息接收端接收后未读数加 1，默认为 true
       }).then((message) => {
         // console.log('发送 app:ChatroomMsgv1 消息成功', message);
         this.msgs.push({
@@ -141,36 +147,73 @@ export default {
     },
     // 初始化融云
     initRongyun() {
-      const config = {
-        appkey: 'qf3d5gbjqhonh',
-        debug: true,
-      };
-      this.ryim = window.RongIMLib.init(config);
-      this.ryChatRoom = this.ryim.ChatRoom.get({
-        id: this.course.uuid,
-      });
-      const conversationList = []; // 当前已存在的会话列表
-      this.msgs = [];
+      const that = this;
+      this.ryim = RongIMLib.init({ appkey: config.ryAppkey });
+      // 添加事件监听
       this.ryim.watch({
-        conversation: (event) => {
-          const ucl = event.updatedConversationList; // 更新的会话列表
-          this.ryim.Conversation.merge({
-            conversationList,
-            ucl,
-          });
-          // console.log(`更新会话汇总: ${ucl}`);
-          // console.log(`最新会话列表: ${this.ryim.Conversation.merge({
-          //   conversationList,
-          //   ucl,
-          // })}`);
+        // 监听会话列表变更事件
+        conversation(event) {
+          // 假定存在 getExistedConversationList 方法，以获取当前已存在的会话列表数据
+          const conversationList = that.getExistedConversationList();
+          // 发生变更的会话列表
+          const { updatedConversationList } = event;
+          // 通过 im.Conversation.merge 计算最新的会话列表
+          const latestConversationList = that.ryim.Conversation
+            .merge({ conversationList, updatedConversationList });
+          console.log(latestConversationList);
         },
-        message: (event) => {
-          const m = event.message;
-          this.msgs.push({ content: m.content.content, extra: JSON.parse(m.content.extra) });
-          // console.log(`收到新消息: ${m}`);
+        // 监听消息通知
+        message(event) {
+          // 新接收到的消息内容
+          const { message } = event;
+          if (message) {
+            that.msgs.push({
+              content: message.content.content,
+              extra: JSON.parse(message.content.extra),
+            });
+          }
         },
-        status: () => {
-          // console.log(`连接状态码: ${event.status}`);
+        // 监听 IM 连接状态变化
+        status(event) {
+          console.log('connection status:', event.status);
+        },
+        // 监听聊天室 KV 数据变更
+        chatroom(event) {
+          /**
+           * 聊天室 KV 存储数据更新
+           * @example
+           * [
+           *  {
+           *    "key": "name",
+           *    "value": "我是小融融",
+           *    "timestamp": 1597591258338,
+           *    "chatroomId": "z002",
+           *    "type": 1 // 1: 更新（ 含:修改和新增 ）、2: 删除
+           *  },
+           * ]
+           */
+          const { updatedEntries } = event;
+          console.log(updatedEntries);
+        },
+        expansion(event) {
+          /**
+           * 更新的消息拓展数据
+           * @example {
+           *    expansion: { key: 'value' },      // 设置或更新的扩展值
+           *    messageUId: 'URIT-URIT-ODMF-DURR' // 设置或更新扩展的消息 uid
+           * }
+           */
+          const { updatedExpansion } = event;
+          console.log('updatedExpansion', updatedExpansion);
+          /**
+           * 删除的消息拓展数据
+           * @example {
+           *    deletedKeys: ['key1', 'key2'],    // 设置或更新的扩展值
+           *    messageUId: 'URIT-URIT-ODMF-DURR' // 设置或更新扩展的消息 uid
+           * }
+           */
+          const { deletedExpansion } = event;
+          console.log('deletedExpansion', deletedExpansion);
         },
       });
       getIMUserToken().then((res) => {
@@ -183,32 +226,39 @@ export default {
     // 连接融云服务器
     connectRY() {
       // im 来自 RongIMLib.init 返回的实例，例如：var im = RongIMLib.init({ appkey: ' ' });
-      this.ryim.connect({ token: this.ryToken }).then(() => {
-        // console.log('链接成功, 链接用户 id 为: ', user.id);
+      this.ryim.connect({ token: this.ryToken }).then((user) => {
+        console.log('链接成功, 链接用户 id 为: ', user.id);
+        this.ryChatRoom = this.ryim.ChatRoom.get({
+          id: this.course.uuid,
+        });
         this.joinChatRoom();
-      }).catch(() => {
-        // console.log('链接失败: ', error.code, error.msg);
+      }).catch((error) => {
+        console.log('链接失败: ', error.code, error.msg);
       });
     },
     // 断开连接融云服务器
     disconnectRY() {
-      this.ryim.disconnect().then(() => {
-        // console.log('断开链接成功');
-      });
+      if (this.ryim) {
+        this.ryim.disconnect().then(() => {
+          // console.log('断开链接成功');
+        });
+      }
     },
     // 加入聊天室
     joinChatRoom() {
       this.ryChatRoom.join({
-        count: 20,
+        count: -1,
       }).then(() => {
         // console.log('加入聊天室成功');
       });
     },
     // 退出聊天室
     quitChatRoom() {
-      this.ryChatRoom.quit().then(() => {
-        // console.log('退出聊天室成功');
-      });
+      if (this.ryChatRoom) {
+        this.ryChatRoom.quit().then(() => {
+          // console.log('退出聊天室成功');
+        });
+      }
     },
   },
 };
