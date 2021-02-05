@@ -44,7 +44,8 @@
           <el-checkbox v-model="disableSendMsg">全体禁言</el-checkbox>
           <a href="javascript:;" class="pictures"><i></i></a>
           <a href="javascript:;" class="faces"><i></i></a>
-          <a href="javascript:;" :class="['send', {'disabled': !chatMsg}]" @click="sendMsg">发送</a>
+          <a href="javascript:;" :class="['send', {'disabled': !(chatMsg && isPushing)}]"
+            @click="sendMsg">发送</a>
         </div>
       </div>
     </div>
@@ -62,7 +63,7 @@ import config from '@/utils/config';
 const RongIMLib = require('@rongcloud/imlib-v4');
 
 export default {
-  props: ['muteLocalAudio'],
+  props: ['muteLocalAudio', 'isPushing'],
   data() {
     return {
       course: null,
@@ -76,6 +77,8 @@ export default {
     };
   },
   mounted() {
+    // 直接初始化
+    window.RongIMLib.RongIMEmoji.init();
     this.msgs = [];
     this.course = this.$store.state.live.curOnduty;
     liveCommentList({
@@ -93,15 +96,22 @@ export default {
             photo: item.authorInfo.photo,
           };
           const obj = {
-            content: item.comment,
+            content: window.RongIMLib.RongIMEmoji.symbolToEmoji(item.comment),
             extra,
           };
           this.msgs.push(obj);
         });
       }
+      setTimeout(() => {
+        this.scrollList();
+      }, 100);
     });
   },
   methods: {
+    scrollList() {
+      const listEle = document.querySelector('.message-list');
+      listEle.scrollTop = listEle.scrollHeight;
+    },
     show() {
       this.initRongyun();
     },
@@ -114,10 +124,10 @@ export default {
     },
     // 发送消息
     sendMsg() {
-      if (!this.chatMsg) return;
+      if (!(this.chatMsg && this.isPushing)) return;
       const obj = {
         role: 'teacher',
-        isMember: 0,
+        isMember: true,
         coins: 0,
         photo: this.$store.getters.photo,
         userName: this.$store.getters.userInfo.live_nickname,
@@ -133,89 +143,97 @@ export default {
       }).then((message) => {
         // console.log('发送 app:ChatroomMsgv1 消息成功', message);
         this.msgs.push({
-          content: message.content.content,
+          content: window.RongIMLib.RongIMEmoji.symbolToEmoji(message.content.content),
           extra: JSON.parse(message.content.extra, 10),
         });
         liveComment({
           courseUUID: this.course.uuid,
-          comment: this.chatMsg,
+          comment: window.RongIMLib.RongIMEmoji.emojiToSymbol(this.chatMsg),
           coins: 0,
           teacherUserId: this.$store.getters.userId,
         });
         this.chatMsg = '';
+        setTimeout(() => {
+          this.scrollList();
+        }, 100);
       });
     },
     // 初始化融云
     initRongyun() {
       const that = this;
-      this.ryim = RongIMLib.init({ appkey: config.ryAppkey });
-      // 添加事件监听
-      this.ryim.watch({
-        // 监听会话列表变更事件
-        conversation(event) {
-          // 假定存在 getExistedConversationList 方法，以获取当前已存在的会话列表数据
-          const conversationList = that.getExistedConversationList();
-          // 发生变更的会话列表
-          const { updatedConversationList } = event;
-          // 通过 im.Conversation.merge 计算最新的会话列表
-          const latestConversationList = that.ryim.Conversation
-            .merge({ conversationList, updatedConversationList });
-          console.log(latestConversationList);
-        },
-        // 监听消息通知
-        message(event) {
-          // 新接收到的消息内容
-          const { message } = event;
-          if (message) {
-            that.msgs.push({
-              content: message.content.content,
-              extra: JSON.parse(message.content.extra),
-            });
-          }
-        },
-        // 监听 IM 连接状态变化
-        status(event) {
-          console.log('connection status:', event.status);
-        },
-        // 监听聊天室 KV 数据变更
-        chatroom(event) {
-          /**
-           * 聊天室 KV 存储数据更新
-           * @example
-           * [
-           *  {
-           *    "key": "name",
-           *    "value": "我是小融融",
-           *    "timestamp": 1597591258338,
-           *    "chatroomId": "z002",
-           *    "type": 1 // 1: 更新（ 含:修改和新增 ）、2: 删除
-           *  },
-           * ]
-           */
-          const { updatedEntries } = event;
-          console.log(updatedEntries);
-        },
-        expansion(event) {
-          /**
-           * 更新的消息拓展数据
-           * @example {
-           *    expansion: { key: 'value' },      // 设置或更新的扩展值
-           *    messageUId: 'URIT-URIT-ODMF-DURR' // 设置或更新扩展的消息 uid
-           * }
-           */
-          const { updatedExpansion } = event;
-          console.log('updatedExpansion', updatedExpansion);
-          /**
-           * 删除的消息拓展数据
-           * @example {
-           *    deletedKeys: ['key1', 'key2'],    // 设置或更新的扩展值
-           *    messageUId: 'URIT-URIT-ODMF-DURR' // 设置或更新扩展的消息 uid
-           * }
-           */
-          const { deletedExpansion } = event;
-          console.log('deletedExpansion', deletedExpansion);
-        },
-      });
+      if (!this.ryim) {
+        this.ryim = RongIMLib.init({ appkey: config.ryAppkey });
+        // 添加事件监听
+        this.ryim.watch({
+          // 监听会话列表变更事件
+          conversation(event) {
+            // 假定存在 getExistedConversationList 方法，以获取当前已存在的会话列表数据
+            const conversationList = that.getExistedConversationList();
+            // 发生变更的会话列表
+            const { updatedConversationList } = event;
+            // 通过 im.Conversation.merge 计算最新的会话列表
+            const latestConversationList = that.ryim.Conversation
+              .merge({ conversationList, updatedConversationList });
+            console.log(latestConversationList);
+          },
+          // 监听消息通知
+          message(event) {
+            // 新接收到的消息内容
+            const { message } = event;
+            if (message) {
+              that.msgs.push({
+                content: window.RongIMLib.RongIMEmoji.symbolToEmoji(message.content.content),
+                extra: JSON.parse(message.content.extra),
+              });
+              setTimeout(() => {
+                that.scrollList();
+              }, 100);
+            }
+          },
+          // 监听 IM 连接状态变化
+          status(event) {
+            console.log('connection status:', event.status);
+          },
+          // 监听聊天室 KV 数据变更
+          chatroom(event) {
+            /**
+             * 聊天室 KV 存储数据更新
+             * @example
+             * [
+             *  {
+             *    "key": "name",
+             *    "value": "我是小融融",
+             *    "timestamp": 1597591258338,
+             *    "chatroomId": "z002",
+             *    "type": 1 // 1: 更新（ 含:修改和新增 ）、2: 删除
+             *  },
+             * ]
+             */
+            const { updatedEntries } = event;
+            console.log(updatedEntries);
+          },
+          expansion(event) {
+            /**
+             * 更新的消息拓展数据
+             * @example {
+             *    expansion: { key: 'value' },      // 设置或更新的扩展值
+             *    messageUId: 'URIT-URIT-ODMF-DURR' // 设置或更新扩展的消息 uid
+             * }
+             */
+            const { updatedExpansion } = event;
+            console.log('updatedExpansion', updatedExpansion);
+            /**
+             * 删除的消息拓展数据
+             * @example {
+             *    deletedKeys: ['key1', 'key2'],    // 设置或更新的扩展值
+             *    messageUId: 'URIT-URIT-ODMF-DURR' // 设置或更新扩展的消息 uid
+             * }
+             */
+            const { deletedExpansion } = event;
+            console.log('deletedExpansion', deletedExpansion);
+          },
+        });
+      }
       getIMUserToken().then((res) => {
         if (res.success) {
           this.ryToken = res.token;
@@ -400,6 +418,10 @@ export default {
   font-weight: 500;
   color: #ffffff;
   margin-left: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 120px;
 }
 
 .message-list .message-item-coin .user-info .coins {

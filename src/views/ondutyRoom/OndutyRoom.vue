@@ -16,7 +16,7 @@
           @stopLive="stopLive">
         </footer-comp>
       </el-container>
-      <aside-comp ref="aside"></aside-comp>
+      <aside-comp ref="aside" :isPushing="isPushing"></aside-comp>
     </el-container>
     <div id="count-down-layer" v-if="countDown > 0">
       {{countDown}} 秒后开始直播
@@ -178,7 +178,9 @@ export default {
         width = this.videoWidth;
         height = parseInt((9 * width) / 16, 10);
       }
-      document.querySelector('.local-video-container').setAttribute('style', `width:${width}px; height:${height}px`);
+      if (document.querySelector('.local-video-container')) {
+        document.querySelector('.local-video-container').setAttribute('style', `width:${width}px; height:${height}px`);
+      }
     },
     trtcReady() {
       // 1. 获取用于承载视频的 HTMLElement；

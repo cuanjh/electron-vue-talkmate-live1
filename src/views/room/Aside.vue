@@ -352,6 +352,10 @@ export default {
   font-weight: 500;
   color: #ffffff;
   margin-left: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 120px;
 }
 
 .message-list .message-item-coin .user-info .coins {

@@ -68,7 +68,7 @@ const vueCliConfig = {
     electronBuilder: {
       builderOptions: {
         appId: 'com.talkmate.app',
-        productName: 'talkmate_live', // 项目名，也是生成的安装文件名，即talkmate_live.exe
+        productName: '全球说教师版', // 项目名，也是生成的安装文件名，即talkmate_live.exe
         copyright: 'Copyright © 2020', // 版权信息
         extraResources: {
           from: './resources',
@@ -80,7 +80,7 @@ const vueCliConfig = {
         // files: ['dist_electron/**/*', '!node_modules'],
         win: {
           // win相关配置
-          // icon: './shanqis.ico', //图标，当前图标在根目录下，注意这里有两个坑
+          icon: 'public/icon/icon.ico', // 图标，当前图标在根目录下，注意这里有两个坑
           // target: [
           //   {
           //     target: 'nsis', //利用nsis制作安装程序
@@ -99,6 +99,7 @@ const vueCliConfig = {
           ],
         },
         mac: {
+          icon: 'public/icon/icon.icns',
           extraFiles: [
             {
               from: 'node_modules/trtc-electron-sdk/build/Release/trtc_electron_sdk.node',
