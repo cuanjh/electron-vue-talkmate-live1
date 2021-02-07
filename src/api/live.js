@@ -161,10 +161,11 @@ export const describeTranscode = (data) => {
 };
 
 // 获取融云IM用户token
-export const getIMUserToken = () => {
+export const getIMUserToken = (data) => {
   const res = request({
     url: urls.imUserTokenUrl,
     method: 'get',
+    data,
   });
   return res;
 };

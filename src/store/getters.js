@@ -1,5 +1,7 @@
 const getters = {
   userId: (state) => state.user.userId,
+  deviceId: (state) => state.user.deviceId,
+  verify: (state) => state.user.verify,
   userInfo: (state) => state.user.userInfo,
   phonenumber: (state) => state.user.phonenumber,
   photo: (state) => state.user.photo,

@@ -10,7 +10,7 @@ const dev = true;
 
 if (dev === true) {
   config.appSecret = '5EAE76C6323C85D2E35D4817020D84C9';
-  config.apiDomain = 'https://pre-api.talkmate.com';
+  config.apiDomain = 'https://api.talkmate.com';
   config.ryAppkey = 'sfci50a7s89ki';
 }
 

@@ -15,6 +15,8 @@ const user = {
   state: {
     userInfo: null,
     userId: '',
+    deviceId: '',
+    verify: '',
     phonenumber: '',
     photo: '',
     verifyStatus: -1,
@@ -22,6 +24,12 @@ const user = {
   mutations: {
     SET_USERID: (state, userId) => {
       state.userId = userId;
+    },
+    SET_DEVICEID: (state, deviceId) => {
+      state.deviceId = deviceId;
+    },
+    SET_VERIFY: (state, verify) => {
+      state.verify = verify;
     },
     SET_USERINFO: (state, userInfo) => {
       state.userInfo = userInfo;
@@ -47,6 +55,7 @@ const user = {
               cookie.setCookie('verify', response.result.verify);
               store.set('isLogin', true);
               commit('SET_USERID', response.result.user_id);
+              commit('SET_VERIFY', response.result.verify);
               resolve(response);
             }
           })
@@ -78,6 +87,7 @@ const user = {
         cookie.delCookie('verify');
         store.set('isLogin', false);
         commit('SET_USERID', '');
+        commit('SET_VERIFY', '');
         resolve();
         // userLogout()
         //   .then(() => {
@@ -97,6 +107,7 @@ const user = {
         cookie.delCookie('verify');
         store.set('isLogin', false);
         commit('SET_USERID', '');
+        commit('SET_VERIFY', '');
         resolve();
       });
     },

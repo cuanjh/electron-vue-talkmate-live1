@@ -85,6 +85,8 @@ export default {
       courseUUID: this.course.uuid,
       startTime: this.course.startTime,
       endTime: (new Date()).getTime(),
+      user_id: this.$store.getters.userId,
+      verify: this.$store.getters.verify,
     }).then((r) => {
       console.log(r);
       if (r.data && r.data.length > 0) {
@@ -151,6 +153,8 @@ export default {
           comment: window.RongIMLib.RongIMEmoji.emojiToSymbol(this.chatMsg),
           coins: 0,
           teacherUserId: this.$store.getters.userId,
+          user_id: this.$store.getters.userId,
+          verify: this.$store.getters.verify,
         });
         this.chatMsg = '';
         setTimeout(() => {
@@ -234,7 +238,11 @@ export default {
           },
         });
       }
-      getIMUserToken().then((res) => {
+      console.log('verify', that.$store.getters.verify);
+      getIMUserToken({
+        user_id: that.$store.getters.userId,
+        verify: that.$store.getters.verify,
+      }).then((res) => {
         if (res.success) {
           this.ryToken = res.token;
           this.connectRY();
