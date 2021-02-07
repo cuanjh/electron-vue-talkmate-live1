@@ -298,12 +298,14 @@ export default {
   z-index: 1;
   display: flex;
   flex-direction: column;
+  -webkit-app-region: drag;
 }
 
 .chat-container {
   display: flex;
   flex-direction: column;
   flex: 1;
+  -webkit-app-region: no-drag;
 }
 
 .chat-container .title {

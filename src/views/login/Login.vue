@@ -139,19 +139,26 @@ export default {
                 .then((res2) => {
                   if (res2.success) {
                     this.loading = false;
+                    let url = '';
+                    const { role } = this.$store.getters.userInfo;
+                    const roles = role.split(',');
                     setTimeout(() => {
                       switch (res2.data.status) {
                         case 0:
-                          this.$router.push({ path: '/verify/edit' });
+                          url = '/verify/edit';
                           break;
                         case 1:
                         case 2:
-                          this.$router.push({ path: '/verify/detail' });
+                          url = '/verify/detail';
                           break;
                         default:
-                          this.$router.push({ path: '/course/rili' });
+                          url = '/course/rili';
+                          if (roles.length === 1 && roles.includes('2')) {
+                            url = '/onduty/rili';
+                          }
                           break;
                       }
+                      this.$router.push({ path: url });
                       ipcRenderer.send('loginSuccess');
                     }, 100);
                   }
