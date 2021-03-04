@@ -81,15 +81,15 @@ const vueCliConfig = {
         win: {
           // win相关配置
           icon: 'icon.ico', // 图标，当前图标在根目录下，注意这里有两个坑
-          // target: [
-          //   {
-          //     target: 'nsis', //利用nsis制作安装程序
-          //     arch: [
-          //       'x64', //64位
-          //       'ia32' //32位
-          //     ]
-          //   }
-          // ],
+          target: [
+            {
+              target: 'nsis', // 利用nsis制作安装程序
+              arch: [
+                'x64', // 64位
+                'ia32', // 32位
+              ],
+            },
+          ],
           extraFiles: [
             {
               from: 'node_modules/trtc-electron-sdk/build/Release',
