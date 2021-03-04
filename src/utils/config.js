@@ -6,7 +6,7 @@ const config = {
   ryAppkey: 'qf3d5gbjqhonh',
 };
 
-const dev = false;
+const dev = true;
 
 if (dev === true) {
   config.appSecret = '5EAE76C6323C85D2E35D4817020D84C9';
