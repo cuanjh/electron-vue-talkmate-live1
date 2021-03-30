@@ -999,17 +999,17 @@
   dependencies:
     mkdirp "^1.0.4"
 
-"@rongcloud/engine@~4.1.1":
-  version "4.1.1"
-  resolved "https://registry.npm.taobao.org/@rongcloud/engine/download/@rongcloud/engine-4.1.1.tgz#64e471ba318e88fbf01ff642c6476785ed680b24"
-  integrity sha1-ZORxujGOiPvwH/ZCxkdnhe1oCyQ=
+"@rongcloud/engine@~4.2.5":
+  version "4.2.6"
+  resolved "https://registry.npm.taobao.org/@rongcloud/engine/download/@rongcloud/engine-4.2.6.tgz#ff092344b7551a0ab2638ee83a9d51e1f788f14f"
+  integrity sha1-/wkjRLdVGgqyY47oOp1R4feI8U8=
 
-"@rongcloud/imlib-v4@^4.1.1":
-  version "4.1.1"
-  resolved "https://registry.npm.taobao.org/@rongcloud/imlib-v4/download/@rongcloud/imlib-v4-4.1.1.tgz#32d873203c3eeaaaaca4fb52e97f32a28f98a998"
-  integrity sha1-MthzIDw+6qqspPtS6X8yoo+YqZg=
+"@rongcloud/imlib-v4@^4.2.6":
+  version "4.2.6"
+  resolved "https://registry.npm.taobao.org/@rongcloud/imlib-v4/download/@rongcloud/imlib-v4-4.2.6.tgz#53923b70a9d829ec0d8af66dfcd22a0a9a7cd7c8"
+  integrity sha1-U5I7cKnYKewNivZt/NIqCpp818g=
   dependencies:
-    "@rongcloud/engine" "~4.1.1"
+    "@rongcloud/engine" "~4.2.5"
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.1"

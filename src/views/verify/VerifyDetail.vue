@@ -165,7 +165,7 @@ export default {
           this.ruleForm.certificate_type = identifyInfo.certificate_type ? identifyInfo.certificate_type : '1';
           this.ruleForm.identity_card = identifyInfo.identity_card;
           this.ruleForm.nationality = identifyInfo.nationality;
-          this.ruleForm.gender = identifyInfo.gender === 1 ? '男' : '女';
+          this.ruleForm.gender = identifyInfo.gender === '1' ? '男' : '女';
           this.ruleForm.birth_date = getAge(moment(identifyInfo.birth_date).format('YYYY-MM-DD'));
           this.ruleForm.address = identifyInfo.address;
           this.ruleForm.live_nickname = identifyInfo.live_nickname;

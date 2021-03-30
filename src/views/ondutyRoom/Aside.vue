@@ -74,6 +74,7 @@ export default {
       conversation: null,
       disableSendMsg: false,
       msgs: [],
+      lastMessageUId: '',
     };
   },
   mounted() {
@@ -84,7 +85,7 @@ export default {
     liveCommentList({
       courseUUID: this.course.uuid,
       startTime: this.course.startTime,
-      endTime: (new Date()).getTime(),
+      endTime: (new Date()).getTime() / 1000,
       user_id: this.$store.getters.userId,
       verify: this.$store.getters.verify,
     }).then((r) => {
@@ -184,11 +185,12 @@ export default {
           message(event) {
             // 新接收到的消息内容
             const { message } = event;
-            if (message) {
+            if (message && that.lastMessageUId !== message.messageUId) {
               that.msgs.push({
                 content: window.RongIMLib.RongIMEmoji.symbolToEmoji(message.content.content),
                 extra: JSON.parse(message.content.extra),
               });
+              that.lastMessageUId = message.messageUId;
               setTimeout(() => {
                 that.scrollList();
               }, 100);
