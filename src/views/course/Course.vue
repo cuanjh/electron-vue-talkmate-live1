@@ -249,7 +249,7 @@ export default {
               case 0:
                 obj.stateDesc = '未开始';
                 obj.disabled = true;
-                obj.period = `${moment(new Date(item.startTime * 1000)).format('HH:mm')}-${moment(new Date(item.EndTime * 1000)).format('HH:mm')}`;
+                obj.period = `${moment(new Date(item.startTime * 1000)).format('HH:mm')}-${moment(new Date(item.endTime * 1000)).format('HH:mm')}`;
                 break;
               case -1:
                 obj.stateDesc = '已下课';
@@ -257,7 +257,7 @@ export default {
                 break;
               default:
                 obj.stateDesc = '上课中';
-                obj.period = `${moment(new Date(item.realStartTime * 1000)).format('HH:mm')}-${moment(new Date(item.EndTime * 1000)).format('HH:mm')}`;
+                obj.period = `${moment(new Date(item.realStartTime * 1000)).format('HH:mm')}-${moment(new Date(item.endTime * 1000)).format('HH:mm')}`;
                 break;
             }
             this.curCourseList.push(obj);

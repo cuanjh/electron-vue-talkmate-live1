@@ -86,7 +86,7 @@ export default {
       let ret = moment(c.date).format('YYYY年MM月DD日');
       switch (c.state) {
         case 0:
-          ret += `${moment(new Date(c.startTime * 1000)).format('HH:mm')}-${moment(new Date(c.EndTime * 1000)).format('HH:mm')}`;
+          ret += `${moment(new Date(c.startTime * 1000)).format('HH:mm')}-${moment(new Date(c.endTime * 1000)).format('HH:mm')}`;
           break;
         case -1:
           ret += `${moment(new Date(c.realStartTime * 1000)).format('HH:mm')}-${moment(new Date(c.realEndTime * 1000)).format('HH:mm')}`;
@@ -101,7 +101,7 @@ export default {
       let ret = '';
       switch (c.state) {
         case 0:
-          ret = Math.floor((c.EndTime - c.startTime) / 60);
+          ret = Math.floor((c.endTime - c.startTime) / 60);
           break;
         case -1:
           ret = Math.floor((c.realEndTime - c.realStartTime) / 60);

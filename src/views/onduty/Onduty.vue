@@ -85,7 +85,7 @@ export default {
         if (result && result.length > 0) {
           result.forEach((r) => {
             arr.push({
-              range: `${moment(r.startTime * 1000).format('HH:mm:ss').slice(0, 5)} - ${moment(r.EndTime * 1000).format('HH:mm:ss').slice(0, 5)}`,
+              range: `${moment(r.startTime * 1000).format('HH:mm:ss').slice(0, 5)} - ${moment(r.endTime * 1000).format('HH:mm:ss').slice(0, 5)}`,
               uuid: r.uuid,
             });
           });

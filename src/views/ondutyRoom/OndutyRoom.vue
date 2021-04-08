@@ -138,7 +138,7 @@ export default {
       const course = this.$store.state.live.curOnduty;
       this.courseUUID = course.uuid;
       const startTime = moment(course.startTime * 1000).format('HH:mm:ss').slice(0, 5);
-      const endTime = moment(course.EndTime * 1000).format('HH:mm:ss').slice(0, 5);
+      const endTime = moment(course.endTime * 1000).format('HH:mm:ss').slice(0, 5);
       this.courseTitle = `${startTime} - ${endTime}`;
       this.userId = this.$store.getters.userId;
       const res = await getLiveCourseRoomId({ uuid: course.uuid });
