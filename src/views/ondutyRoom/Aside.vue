@@ -185,7 +185,9 @@ export default {
           message(event) {
             // 新接收到的消息内容
             const { message } = event;
+            console.log('message', message);
             if (message && that.lastMessageUId !== message.messageUId) {
+              console.log('messageUId', message.messageUId);
               that.msgs.push({
                 content: window.RongIMLib.RongIMEmoji.symbolToEmoji(message.content.content),
                 extra: JSON.parse(message.content.extra),
